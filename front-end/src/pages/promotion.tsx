@@ -24,35 +24,35 @@ interface Promotion {
 const promotionsData: Promotion[] = [
   {
     id: 1,
-    title: 'Ty pierdolony skurwysyn idz do dupy szmato jebana',
+    title: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur imperdiet accumsan pretium.',
     description: 'Share in 50,000$!',
     endTime: '00.01AM 01/15/2026',
     imageUrl: promo1
   },
   {
     id: 2,
-    title: 'Ty pierdolony skurwysyn idz do dupy szmato jebana',
+    title: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur imperdiet accumsan pretium.',
     description: '10,000$ Prize Pool!',
     endTime: '2:00AM 12/24/2025',
     imageUrl: promo2
   },
   {
     id: 3,
-    title: 'Ty pierdolony skurwysyn idz do dupy szmato jebana',
+    title: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur imperdiet accumsan pretium.',
     description: 'Win your share 7$',
     endTime: '2:59PM 12/29/2025',
     imageUrl: promo3
   },
   {
     id: 4,
-    title: 'Ty pierdolony skurwysyn idz do dupy szmato jebana',
+    title: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur imperdiet accumsan pretium.',
     description: '50,000$ Prize Pool!',
     endTime: '10:PM 05/13/2026',
     imageUrl: promo4
   },
   {
     id: 5,
-    title: 'Ty pierdolony skurwysyn idz do dupy szmato jebana',
+    title: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur imperdiet accumsan pretium.',
     description: 'Win biggest jackpot',
     endTime: '6:30AM 11/03/2026',
     imageUrl: promo5

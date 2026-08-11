@@ -1,4 +1,4 @@
-﻿using API.Data;
+using API.Data;
 using API.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -19,16 +19,9 @@ namespace API.DbInitializer
         }
         public void Initialize()
         {
-            try
+            if (_context.Database.GetPendingMigrations().Count() > 0)
             {
-                if(_context.Database.GetPendingMigrations().Count() > 0)
-                {
-                    _context.Database.Migrate();
-                }
-            }
-            catch (Exception)
-            {
-
+                _context.Database.Migrate();
             }
             if(_context.Roles.Any(x => x.Name == Utility.Helper.Admin))
             {
@@ -37,15 +30,23 @@ namespace API.DbInitializer
             _roleManager.CreateAsync(new IdentityRole(Utility.Helper.Admin)).GetAwaiter().GetResult();
             _roleManager.CreateAsync(new IdentityRole(Utility.Helper.User)).GetAwaiter().GetResult();
 
-            _userManager.CreateAsync(new ApplicationUsers
+            var admin = new ApplicationUsers
             {
-                UserName = "admin@gmail.com",
+                UserName = "admin",
                 Email = "admin@gmail.com",
                 EmailConfirmed = true,
-                Name = "Admin"
-            }, "Admin123!").GetAwaiter().GetResult();
-            ApplicationUsers user = _context.Users.FirstOrDefault(x => x.Email == "admin@gmail.com");
-            _userManager.AddToRoleAsync(user, Utility.Helper.Admin).GetAwaiter().GetResult();
+                Name = "Admin",
+                Balance = 1000m
+            };
+
+            var created = _userManager.CreateAsync(admin, "Admin123!").GetAwaiter().GetResult();
+            if (!created.Succeeded)
+            {
+                throw new InvalidOperationException(
+                    "Failed to seed the admin account: " + string.Join(" ", created.Errors.Select(e => e.Description)));
+            }
+
+            _userManager.AddToRoleAsync(admin, Utility.Helper.Admin).GetAwaiter().GetResult();
         }
     }
 }

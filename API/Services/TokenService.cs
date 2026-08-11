@@ -1,4 +1,4 @@
-﻿using API.Interfaces;
+using API.Interfaces;
 using API.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -18,19 +18,25 @@ namespace API.Services
         {
             var secretKey = _configuration["AppSettings:TokenKey"];
 
-            //patikrinam ar tkoenas null ar empty
             if (string.IsNullOrEmpty(secretKey))
             {
-                throw new ArgumentNullException("Token bby zinia kur");
+                throw new InvalidOperationException(
+                    "AppSettings:TokenKey is missing. Set it with: dotnet user-secrets set \"AppSettings:TokenKey\" \"<32+ char string>\"");
             }
+
+            if (string.IsNullOrEmpty(users.UserName))
+            {
+                throw new InvalidOperationException($"Cannot issue a token for user {users.Id}: UserName is not set.");
+            }
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, users.UserName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.NameIdentifier, users.Id.ToString())
+                new Claim(ClaimTypes.NameIdentifier, users.Id),
+                new Claim(ClaimTypes.Name, users.UserName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
             var token = new JwtSecurityToken
             (

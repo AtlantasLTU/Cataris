@@ -105,26 +105,26 @@ export default function Home() {
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
               <p className="text-sm font-medium text-amber-50">
-                Having issues with our website?
+                Having issues with this website?
               </p>
             </div>
 
             <p className="mt-1 text-sm leading-relaxed text-amber-100/90">
               Please contact{" "}
               <a
-                href="mailto:jakub.r002@gmail.com"
+                href="mailto:atlantasalisauskas2014@gmail.com"
                 className="font-semibold text-amber-100 underline decoration-amber-300/40 underline-offset-4 hover:text-amber-50 hover:decoration-amber-200/70"
               >
-                jakub.r002@gmail.com
+                atlantasalisauskas2014@gmail.com
               </a>{" "}
               or{" "}
               <a
-                href="https://www.facebook.com/jakub.rog.585"
+                href="https://www.linkedin.com/in/atlantas-ali%C5%A1auskas/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-semibold text-amber-50 underline decoration-amber-300/40 underline-offset-4 hover:text-white hover:decoration-amber-200/70"
               >
-                Jakub Rogoža on Facebook
+                Atlantas Ališauskas on LinkedIn
               </a>{" "}
                to solve the problem.
             </p>

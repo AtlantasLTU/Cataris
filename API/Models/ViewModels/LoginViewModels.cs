@@ -1,15 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace API.Models.ViewModels
 {
     public class LoginViewModels
     {
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress]
-        public string Email { get; set; }
-        [Required(ErrorMessage = "Passwrd is required")]
+        [Required(ErrorMessage = "Username is required")]
+        public string Username { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Password is required")]
         [DataType(DataType.Password)]
-        public string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }
     }

@@ -45,11 +45,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// Skipped in development: the front-end talks to the plain http:// endpoint, and a
+// redirect to https would break those calls (and the CORS preflight with them).
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseCors(FrontEnd);
 
-
-app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
