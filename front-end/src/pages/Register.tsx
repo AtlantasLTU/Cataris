@@ -44,7 +44,7 @@ const Register: React.FC<RegisterProps> = ({ onClose }) => {
             if (onClose) {
                 onClose();
             }
-            navigate('/');
+            void navigate('/');
             window.location.reload();
             /*
         const result = await login({username, password});

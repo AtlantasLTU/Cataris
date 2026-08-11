@@ -24,7 +24,7 @@ export default function Wallet() {
   const closeAuthModal = () => {
     setShowLogin(false);
     setShowRegister(false);
-    navigate("/wallet", { replace: true }); // clears ?auth=...
+    void navigate("/wallet", { replace: true }); // clears ?auth=...
   };
   const getBalance = async () => {
     const result = await fetchWalletBalance();
@@ -127,7 +127,6 @@ export default function Wallet() {
   const handleSaveUserInfo = async () => {
     setSaveSuccess(null);
 
-    // lekkie sanity-checki po froncie (backend i tak powinien walidować)
     const nextUsername = editUsername.trim();
     const nextEmail = editEmail.trim();
 
@@ -140,7 +139,7 @@ export default function Wallet() {
     try {
       const result = await updateUserInfo(nextUsername, nextEmail);
 
-      if ("message" in result) {
+      if (!("type" in result)) {
         setSaveSuccess(result.message || "Saved.");
         await getUserInfo(); // source of truth
       } else {
@@ -160,7 +159,7 @@ export default function Wallet() {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
   const isEmailValid = useMemo(() => {
-    if (!editEmail.trim()) return true; // pozwalamy na pusty (brak zmiany)
+    if (!editEmail.trim()) return true;
     return emailRegex.test(editEmail.trim());
   }, [editEmail]);
 
@@ -174,7 +173,7 @@ export default function Wallet() {
                 <img
                   src={logo}
                   alt="Logo"
-                  className="w-16 h-auto" // Adjust the size of your logo
+                  className="w-16 h-auto"
                 />
                 <p className="text-xl ml-4 text-gray-700">Please log in</p>
               </div>

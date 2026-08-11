@@ -20,7 +20,7 @@ export default function Games() {
     const closeAuthModal = () => {
         setShowLogin(false);
         setShowRegister(false);
-        navigate("/games/roulette", { replace: true }); // clears ?auth=...
+        void navigate("/games/roulette", { replace: true }); // clears ?auth=...
     };
     return (
         <main className="home flow">

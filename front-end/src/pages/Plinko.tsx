@@ -56,7 +56,7 @@ export default function PlinkoGame() {
           console.error("Failed to fetch wallet balance:", result.message);
         }
       };
-      getBalance();
+      void getBalance();
       // Fetch user balance if authenticated
     }
   }, []);
@@ -64,7 +64,7 @@ export default function PlinkoGame() {
   const closeAuthModal = () => {
     setShowLogin(false);
     setShowRegister(false);
-    navigate("/games/meow-jack", { replace: true }); // clears ?auth=...
+    void navigate("/games/meow-jack", { replace: true }); // clears ?auth=...
   };
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -107,22 +107,14 @@ export default function PlinkoGame() {
     ro.observe(parent);
     window.addEventListener('resize', resize);
     
-    const manager = new BallManager(canvas as HTMLCanvasElement, (sinkIndex) => {
+    const manager = new BallManager(canvas as HTMLCanvasElement, async (sinkIndex) => {
       const wager = lastBetRef.current;
       if (wager === null || sinkIndex === undefined || sinkIndex < 0 || sinkIndex >= multipliers.length) return;
       const multiplier = multipliers[sinkIndex];
       const payout = (wager * multiplier).toFixed(2).toString();
-      updateWalletBalance(payout, "win");
-      setTimeout(() => {
-        window.dispatchEvent(new Event("balance:refresh"));
-      }, 700);
+      await updateWalletBalance(payout, "win");
+      window.dispatchEvent(new Event("balance:refresh"));
     });
-    /*
-    const img = new Image();
-    img.src = yarnBall;
-    img.onload = () => {
-      manager.setBallSprite(img);
-    };*/
     setBallManager(manager);
 
     return () => {
@@ -137,15 +129,13 @@ export default function PlinkoGame() {
     // Additional reset logic if needed
   }
 
-  const dropBall = () => {
+  const dropBall = async () => {
     if (!ballManager || betAmount === null || betAmount <= 0) return;
 
     // Deduct wager upfront
     lastBetRef.current = betAmount;
-    updateWalletBalance(betAmount.toFixed(2), "loss");
-    setTimeout(() => {
-      window.dispatchEvent(new Event("balance:refresh"));
-    }, 300);
+    await updateWalletBalance(betAmount.toFixed(2), "loss");
+    window.dispatchEvent(new Event("balance:refresh"));
 
     // Use WIDTH / 2.055 for both obstacles and sinks to keep perfect alignment
     const spacing = 50;
@@ -222,7 +212,7 @@ export default function PlinkoGame() {
         </div>
       )}
       <div className="w-full flex items-center justify-center py-4">
-        <div className="flex items-center justify-center w-full max-w-screen-xl px-2 sm:px-4">
+        <div className="flex items-center justify-center w-full max-w-7xl px-2 sm:px-4">
           <BettingPanel betAmount={betAmount} setBetAmount={setBetAmount} startGame={resetGame} dropBall={dropBall} gameOver={gameOver}>
             {/* <div className="w-full h-full sm:rounded-none md:rounded-tr-2xl flex justify-center items-center relative"> */}
             <canvas
@@ -242,7 +232,7 @@ export default function PlinkoGame() {
         </div>
       </div>
       {/* DESCRIPTION CARD UNDER GAME */}
-      <section className="mt-8 w-full max-w-[1200px] mx-auto px-4 pb-10">
+      <section className="mt-8 w-full max-w-300 mx-auto px-4 pb-10">
         <div className="rounded-2xl bg-[#0f2f57]/80 shadow-xl border border-white/10 p-6">
           <div className="flex items-center gap-6">
             <h2 className="text-white text-2xl font-extrabold tracking-wide">
@@ -260,7 +250,7 @@ export default function PlinkoGame() {
             <img
               src={plinko}
               alt="Logo"
-              className="w-[140px] md:w-[140px] h-auto rounded-xl shadow-lg"
+              className="w-35 md:w-35 h-auto rounded-xl shadow-lg"
             />
 
             {/* TEXT */}

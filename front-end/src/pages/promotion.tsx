@@ -72,7 +72,7 @@ export default function Promotions() {
   const closeAuthModal = () => {
     setShowLogin(false);
     setShowRegister(false);
-    navigate("/promotions", { replace: true }); // clears ?auth=...
+    void navigate("/promotions", { replace: true }); // clears ?auth=...
   };
   return (
     <main className="promotions">

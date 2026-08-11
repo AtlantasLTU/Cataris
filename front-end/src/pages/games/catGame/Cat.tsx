@@ -29,7 +29,7 @@ export default function Home() {
   const closeAuthModal = () => {
     setShowLogin(false);
     setShowRegister(false);
-    navigate("/", { replace: true }); // clears ?auth=...
+    void navigate("/", { replace: true }); // clears ?auth=...
   };
 
   const startGame = () => {

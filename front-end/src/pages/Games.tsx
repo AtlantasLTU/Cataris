@@ -68,7 +68,7 @@ export default function Games() {
   const closeAuthModal = () => {
     setShowLogin(false);
     setShowRegister(false);
-    navigate("/games", { replace: true }); // clears ?auth=...
+    void navigate("/games", { replace: true }); // clears ?auth=...
   };
   return (
     <div className="games-container">

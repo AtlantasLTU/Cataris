@@ -65,7 +65,7 @@ export default function Home() {
   const closeAuthModal = () => {
     setShowLogin(false);
     setShowRegister(false);
-    navigate("/games/meow-jack", { replace: true }); // clears ?auth=...
+    void navigate("/games/meow-jack", { replace: true }); // clears ?auth=...
   };
 
   const [gameDeck, setGameDeck] = useState<CardDeck[]>(combinations);

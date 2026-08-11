@@ -89,7 +89,7 @@ const Treat = () => {
   const closeAuthModal = () => {
     setShowLogin(false);
     setShowRegister(false);
-    navigate("/games/treat", { replace: true }); // clears ?auth=...
+    void navigate("/games/treat", { replace: true }); // clears ?auth=...
   };
 
   const disableReveals = useMemo(

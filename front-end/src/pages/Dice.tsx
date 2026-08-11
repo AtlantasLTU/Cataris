@@ -71,7 +71,7 @@ const Dice = () => {
   const closeAuthModal = () => {
     setShowLogin(false);
     setShowRegister(false);
-    navigate("/games/dice", { replace: true }); // clears ?auth=...
+    void navigate("/games/dice", { replace: true }); // clears ?auth=...
   };
 
   const handleRoll = (): Promise<'win' | 'loss'> => {

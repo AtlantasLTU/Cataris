@@ -28,7 +28,7 @@ const Login: React.FC<LoginProps> = ({ onClose }) => {
                 if (onClose) {
                     onClose();
                 }
-                navigate("/");
+                void navigate("/");
                 window.location.reload();
             }
             else {
