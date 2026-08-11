@@ -98,7 +98,7 @@ export default function Home() {
             <img
               src={cat}
               alt="Logo"
-              className="w-[140px] md:w-[140px] h-auto rounded-xl shadow-lg"
+              className="w-35 md:w-35 h-auto rounded-xl shadow-lg"
             />
 
             {/* TEXT */}

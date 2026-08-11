@@ -299,7 +299,7 @@ export default function Home() {
                     <img
                       src={banner}
                       alt="Blackjack banner"
-                      className="w-[260px] my-4 drop-shadow-lg"
+                      className="w-65 my-4 drop-shadow-lg"
                     />
                     <Hand
                       cards={playerHand}
@@ -338,7 +338,7 @@ export default function Home() {
         </div>
       </div>
       {/* DESCRIPTION CARD UNDER GAME */}
-      <section className="mt-8 w-full max-w-[1200px] mx-auto px-4 pb-10">
+      <section className="mt-8 w-full max-w-300 mx-auto px-4 pb-10">
         <div className="rounded-2xl bg-[#0f2f57]/80 shadow-xl border border-white/10 p-6">
           <div className="flex items-center gap-6">
             <h2 className="text-white text-2xl font-extrabold tracking-wide">
@@ -356,7 +356,7 @@ export default function Home() {
             <img
               src={meowJack}
               alt="Logo"
-              className="w-[140px] md:w-[140px] h-auto rounded-xl shadow-lg"
+              className="w-35 md:w-35 h-auto rounded-xl shadow-lg"
             />
 
             {/* TEXT */}

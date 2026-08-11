@@ -216,7 +216,7 @@ export class BallManager {
 
     private playSinkHitSound() {
         try {
-            const Ctor = (window as any).AudioContext || (window as any).webkitAudioContext;
+            const Ctor = window.AudioContext ?? (window as Window & { webkitAudioContext?: typeof AudioContext}).webkitAudioContext;
             if (!Ctor) return;
             const ctx = this.audioCtx ?? (this.audioCtx = new Ctor());
             const osc = ctx.createOscillator();

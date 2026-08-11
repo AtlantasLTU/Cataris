@@ -51,7 +51,7 @@ const Dice = () => {
           console.error("Failed to fetch wallet balance:", result.message);
         }
       };
-      getBalance();
+      void getBalance();
       // Fetch user balance if authenticated
     }
   }, []);
@@ -89,7 +89,7 @@ const Dice = () => {
     let step = 0;
 
     return new Promise((resolve) => {
-      const interval = window.setInterval(() => {
+      const interval = window.setInterval(async () => {
         step += 1;
         const tempValue = clampToRange(Math.floor(Math.random() * 100) + 1);
         setMarkerValue(tempValue);
@@ -110,17 +110,13 @@ const Dice = () => {
           resolve(didWin ? 'win' : 'loss');
           if (didWin) {
             const finalValue = payout - betAmount!;
-            updateWalletBalance(finalValue.toString(), "win");
+            await updateWalletBalance(finalValue.toString(), "win");
             console.log("WIN update wallet balance called");
-            setTimeout(() => {
-              window.dispatchEvent(new Event("balance:refresh"));
-            }, 50);
+            window.dispatchEvent(new Event("balance:refresh"));
           } else {
-            updateWalletBalance(wager.toFixed(2).toString(), "loss");
+            await updateWalletBalance(wager.toFixed(2).toString(), "loss");
             console.log("LOSS update wallet balance called");
-            setTimeout(() => {
-              window.dispatchEvent(new Event("balance:refresh"));
-            }, 50);
+            window.dispatchEvent(new Event("balance:refresh"));
           }
         }
       }, 70);
@@ -231,7 +227,7 @@ const Dice = () => {
         </div>
       </div>
       {/* DESCRIPTION CARD UNDER GAME */}
-      <section className="mt-8 w-full max-w-[1200px] mx-auto px-4 pb-10">
+      <section className="mt-8 w-full max-w-300 mx-auto px-4 pb-10">
         <div className="rounded-2xl bg-[#0f2f57]/80 shadow-xl border border-white/10 p-6">
           <div className="flex items-center gap-6">
             <h2 className="text-white text-2xl font-extrabold tracking-wide">
@@ -249,7 +245,7 @@ const Dice = () => {
             <img
               src={mice}
               alt="Logo"
-              className="w-[140px] md:w-[140px] h-auto rounded-xl shadow-lg"
+              className="w-35 md:w-35 h-auto rounded-xl shadow-lg"
             />
 
             {/* TEXT */}

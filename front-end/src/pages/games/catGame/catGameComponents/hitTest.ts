@@ -7,7 +7,7 @@ import { runState, settleRun, multipliers } from "./runState";
 //let resultDOM: HTMLElement | null = null;
 //let finalScoreDOM: HTMLElement | null = null;
 
-export function hitTest() {
+export async function hitTest() {
   if(runState.settled) return;
   const resultDOM = document.getElementById("result-container");
   const finalScoreDOM = document.getElementById("final-score");
@@ -32,10 +32,10 @@ if (position.currentRow === 11) {
     jackpotDOM.innerText = `JACKPOT! YOU WON ${payout}!`;
   }
 
-  updateWalletBalance(String(payout), "win");
+  await updateWalletBalance(String(payout), "win");
   window.dispatchEvent(new Event("game:over"));
 
-  setTimeout(() => window.dispatchEvent(new Event("balance:refresh")), 50);
+  window.dispatchEvent(new Event("balance:refresh"));
 
   return;
 }
@@ -63,10 +63,8 @@ if (position.currentRow === 11) {
         window.dispatchEvent(new Event("game:over"));
         resultDOM.style.visibility = "visible";
         finalScoreDOM.innerText = position.currentRow.toString();
-        updateWalletBalance(String(payout), "win");
-        setTimeout(() => {
-          window.dispatchEvent(new Event("balance:refresh"));
-        }, 50);
+        await updateWalletBalance(String(payout), "win");
+        window.dispatchEvent(new Event("balance:refresh"));
         console.log(position.currentRow)
         console.log("hit!");
         break;
