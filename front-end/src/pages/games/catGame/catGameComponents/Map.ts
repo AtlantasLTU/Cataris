@@ -251,12 +251,20 @@ function removeManholeStripes(rowIndex: number) {
 }
 
 
+function isMesh(obj: THREE.Object3D): obj is THREE.Mesh {
+  return (obj as Partial<THREE.Mesh>).isMesh === true;
+}
+
 function disposeObject(obj: THREE.Object3D) {
-  obj.traverse((child: any) => {
-    if (child.geometry) child.geometry.dispose();
-    if (child.material) {
-      if (Array.isArray(child.material)) child.material.forEach((m: any) => m.dispose());
-      else child.material.dispose();
+  obj.traverse((child) => {
+    if (isMesh(child)) {
+      child.geometry.dispose();
+
+      if (Array.isArray(child.material)) {
+        child.material.forEach((m) => m.dispose());
+      } else {
+        child.material.dispose();
+      }
     }
   });
 }

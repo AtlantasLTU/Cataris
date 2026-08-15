@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { updateWalletBalance, fetchUserInfo, fetchWalletBalance, updateUserInfo } from "../api/auth";
-import { useSearchParams } from "react-router-dom";
 import Login from "./Login";
 import Register from "./Register";
 import logo from "../assets/LOGO.svg";
@@ -8,8 +7,9 @@ import { useAuthModal } from "../hooks/useAuthModal";
 import { useIsAuthenticated } from "../hooks/useAuth";
 import { useBalance } from "../hooks/useBalance";
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
 export default function Wallet() {
-  const [] = useSearchParams();
   const isAuthenticated = useIsAuthenticated();
   const { balance: accountBalance } = useBalance();
   const [loading, setLoading] = useState<boolean>(false); // For button loading state
@@ -20,7 +20,6 @@ export default function Wallet() {
   const [editUsername, setEditUsername] = useState<string>("");
   const [editEmail, setEditEmail] = useState<string>("");
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
-  const [depositCooldown, setDepositCooldown] = useState<number>(0); // Time remaining in seconds
 
   const getUserInfo = async () => {
     const result = await fetchUserInfo();
@@ -39,15 +38,11 @@ export default function Wallet() {
   }, [editUsername, editEmail, username, email]);
 
   // Initialize cooldown from localStorage
-  useEffect(() => {
-    const storedCooldown = localStorage.getItem("depositCooldown");
-    if (storedCooldown) {
-      const cooldownEnd = parseInt(storedCooldown);
-      const now = Date.now();
-      const remaining = Math.max(0, Math.ceil((cooldownEnd - now) / 1000));
-      setDepositCooldown(remaining);
-    }
-  }, []);
+  const [depositCooldown, setDepositCooldown] = useState<number>(() => {
+    const stored = localStorage.getItem("depositCooldown");
+    if (!stored) return 0;
+    return Math.max(0, Math.ceil((parseInt(stored, 10) - Date.now()) / 1000));
+  });
 
   // Countdown timer effect
   useEffect(() => {
@@ -113,7 +108,7 @@ export default function Wallet() {
         console.error("Save failed:")
       }
     } catch (e) {
-      console.error("Save failed")
+      console.error("Save failed:", e)
     } finally {
       setSaving(false);
     }
@@ -123,7 +118,6 @@ export default function Wallet() {
     setEditUsername(username === "-" ? "" : username);
     setEditEmail(email === "-" ? "" : email);
   };
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
   const isEmailValid = useMemo(() => {
     if (!editEmail.trim()) return true;
@@ -183,7 +177,7 @@ export default function Wallet() {
 
         {/* Actions */}
         <button
-          onClick={handleDeposit}
+          onClick={() => void handleDeposit()}
           disabled={loading || depositCooldown > 0}
           className={`w-full py-4 rounded-lg font-semibold transition-all hover:-translate-y-0.5 hover:shadow-lg ${
             loading || depositCooldown > 0
@@ -220,7 +214,7 @@ export default function Wallet() {
         </div>
         <div className="flex gap-3">
           <button
-            onClick={handleSaveUserInfo}
+            onClick={() => void handleSaveUserInfo()}
             disabled={saving || !hasChanges || !isEmailValid}
             className="flex-1 py-3 bg-blue-500 rounded-lg font-semibold hover:bg-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >

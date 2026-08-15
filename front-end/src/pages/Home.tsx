@@ -57,7 +57,7 @@ export default function Home() {
           <h3 className="sponsor__title">Credits:</h3>
           <button
             className="sponsor__button"
-            onClick={() => navigate('/about')}
+            onClick={() => void navigate('/about')}
             aria-label="Visit our sponsor"
           >
             <img src={sponsorLogo} alt="Sponsor Logo" className="sponsor__logo" />

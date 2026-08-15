@@ -47,13 +47,6 @@ export function Renderer() {
     renderer.setAnimationLoop(null);
 
     renderer.dispose();
-
-    // optional but very effective when re-entering scenes often:
-    //renderer.forceContextLoss?.();
-
-    // release references
-    // @ts-expect-error
-    renderer.domElement = null;
   };
 
   return {renderer, dispose};

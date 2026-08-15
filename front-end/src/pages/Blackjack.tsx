@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./Home.css";
 import Login from "./Login";
 import Register from "./Register";
 import { useAuthModal } from "../hooks/useAuthModal";
-// @ts-ignore
-import { combinations } from "../assets/CardDeck";
+import { combinations, type Card } from "../assets/CardDeck";
 import Hand from "../components/Hand";
 import BettingPanel from "../components/BettingPanelBlackJack";
 import banner from "../assets/BANNER.svg";
@@ -13,26 +12,14 @@ import logo from "../assets/LOGO.svg";
 import { updateWalletBalance } from "../api/auth";
 import meowJack from "../assets/games/game-meowjack.png";
 import { useIsAuthenticated } from "../hooks/useAuth";
-import { useBalance } from "../hooks/useBalance";
 
-interface CardDeck {
-  suit: string;
-  rank: string;
-}
-
-interface GameOverResult {
-  type: string;
-  message: string;
-}
 
 export default function Home() {
   const { showLogin, showRegister, closeAuthModal } = useAuthModal("/games/meow-jack");
   const isAuthenticated = useIsAuthenticated();
-  const { balance: accountBalance } = useBalance();
-
-  const [gameDeck, setGameDeck] = useState<CardDeck[]>(combinations);
-  const [playerHand, setPlayerHand] = useState<CardDeck[]>([]);
-  const [dealerHand, setDealerHand] = useState<CardDeck[]>([]);
+  const [gameDeck, setGameDeck] = useState<Card[]>(combinations);
+  const [playerHand, setPlayerHand] = useState<Card[]>([]);
+  const [dealerHand, setDealerHand] = useState<Card[]>([]);
   const [betAmount, setBetAmount] = useState<number | null>(null);
   const [gameOver, setGameOver] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
@@ -40,20 +27,9 @@ export default function Home() {
     type: "",
     message: "",
   });
-  const [newGame, setNewGame] = useState(false);
   const [dealerRevealed, setDealerRevealed] = useState(false);
 
-
-  const getRandomCardFromDeck = () => {
-    const randomIndex = Math.floor(Math.random() * gameDeck.length);
-    const card = gameDeck[randomIndex];
-    const newDeck = gameDeck.filter((_, index) => index !== randomIndex);
-    setGameDeck(newDeck);
-    console.log(accountBalance);
-    return card;
-  };
-
-  const getCardValue = (card: CardDeck) => {
+  const getCardValue = (card: Card) => {
     if (card.rank === "D" || card.rank === "J" || card.rank === "K") {
       return 10;
     } else if (card.rank === "A") {
@@ -63,10 +39,41 @@ export default function Home() {
     }
   };
 
-  const calculateHandValue = (hand: CardDeck[]) => {
+  const drawFrom = (deck: Card[]): [Card, Card[]] => {
+    const i = Math.floor(Math.random() * deck.length);
+    return [deck[i], deck.filter((_, index) => index !== i)];
+  };
+
+  const handleDeposit = async (outcome: "win" | "loss", amount: number) => {
+  try {
+    await updateWalletBalance(amount.toFixed(2), outcome);
+    window.dispatchEvent(new Event("balance:refresh"));
+  } catch (error) {
+    console.error("Failed to update wallet balance: ", error);
+  }
+};
+
+  const settle = (type: string, message: string, outcome?: "win" | "loss", payout?: string) => {
+    const wager = betAmount;
+
+    setResult({ type, message });
+    setGameOver(true);
+    setGameStarted(false);
+    setDealerRevealed(true);
+    if (payout) {
+      void updateWalletBalance(payout, "win");
+    } else if (outcome && wager !== null) {
+      void handleDeposit(outcome, wager);
+    }
+    setBetAmount(null);
+    window.dispatchEvent(new Event("balance:refresh"));
+    setTimeout(() => window.dispatchEvent(new Event("balance:refresh")), 500);
+  };
+
+  const calculateHandValue = (hand: Card[]) => {
     let value = 0;
     let aceCount = 0;
-    hand.forEach((card: CardDeck) => {
+    hand.forEach((card: Card) => {
       value += getCardValue(card);
       if (card.rank === "A") {
         aceCount += 1;
@@ -79,81 +86,84 @@ export default function Home() {
     return value;
   };
 
-  const handleGamerOver = (result: GameOverResult) => {
-    window.dispatchEvent(new Event("balance:refresh"));
-    setGameOver(true);
-    setResult(result);
-    setBetAmount(null);
-    setGameStarted(false);
-    setTimeout(() => {
-      window.dispatchEvent(new Event("balance:refresh"));
-    }, 500);
-  };
-
   const dealCardToPlayer = () => {
-    const newHand = [...playerHand, getRandomCardFromDeck()];
+    const [card, rest] = drawFrom(gameDeck);
+    const newHand = [...playerHand, card];
     setPlayerHand(newHand);
-    const playerValue = calculateHandValue(newHand);
-    console.log(newHand);
-    console.log(playerValue);
-    if (playerValue > 21) {
-      handleGamerOver({ type: "dealer", message: "Dealer wins" });
-      handleDeposit("loss");
-      console.log("LOSS-ABOVE");
-      window.dispatchEvent(new Event("balance:refresh"));
+    setGameDeck(rest);
+
+    const value = calculateHandValue(newHand);
+    if (value === 21 && betAmount !== null) {
+      settle("player", "BlackJack! Player won", undefined, (betAmount * 1.5).toFixed(2));
+    } else if (value > 21) {
+      settle("dealer", "Dealer wins", "loss");
     }
   };
 
   const playerStand = () => {
-    setDealerRevealed(true);
-    setGameOver(true);
-    const newHand = [...dealerHand, getRandomCardFromDeck()];
-    setDealerHand(newHand);
-    console.log(newHand);
-    const dealerValue = calculateHandValue(newHand);
-    console.log(dealerValue);
-    if (dealerValue > 21) {
-      handleGamerOver({ type: "player", message: "Player wins" });
-      console.log("win-ABOVE");
-      window.dispatchEvent(new Event("balance:refresh"));
+    let deck = gameDeck;
+    let hand = dealerHand;
+
+    // dealer draws to 17, standard blackjack rule
+    while (calculateHandValue(hand) < 17 && deck.length > 0) {
+      const [card, rest] = drawFrom(deck);
+      hand = [...hand, card];
+      deck = rest;
+    }
+
+    setDealerHand(hand);
+    setGameDeck(deck);
+
+    const dValue = calculateHandValue(hand);
+    const pValue = calculateHandValue(playerHand);
+
+    if (dValue > 21 || pValue > dValue) {
+      settle("player", "Player wins", "win");
+    } else if (dValue === pValue) {
+      settle("", "Draw");
+    } else {
+      settle("dealer", "Dealer Wins", "loss");
     }
   };
 
-  const handleDeposit = async (outcome: "win" | "loss") => {
-    if (betAmount === null) {
+  const resetGame = () => {
+    const deck = [...combinations];
+    const draw = () => {
+      const i = Math.floor(Math.random() * deck.length);
+      return deck.splice(i, 1)[0];
+    };
+
+    const newPlayerHand = [draw(), draw()];
+    const newDealerHand = [draw(), draw()];
+
+    setPlayerHand(newPlayerHand);
+    setDealerHand(newDealerHand);
+    setGameDeck(deck);
+    setResult({ type: "", message: "" });
+
+    const playerNatural = calculateHandValue(newPlayerHand) === 21;
+    const dealerNatural = calculateHandValue(newDealerHand) === 21;
+
+    if (playerNatural || dealerNatural) {
+      if (playerNatural && dealerNatural) {
+        settle("", "Draw");
+      } else if (playerNatural) {
+        settle(
+          "player",
+          "BlackJack! Player won",
+          undefined,
+          betAmount !== null ? (betAmount * 1.5).toFixed(2) : undefined
+        );
+      } else {
+        settle("dealer", "Dealer Wins", "loss");
+      }
       return;
     }
-    const betAmountStr = (betAmount.toFixed(2)).toString();
-    if (outcome === "win") {
-      try {
-        updateWalletBalance(betAmountStr, outcome);
-        console.log("WIN update wallet balance called");
-        window.dispatchEvent(new Event("balance:refresh"));
-      } catch (error) {
-        console.error("Failed to update wallet balance: ", error);
-      }
-    }
-    if (outcome === "loss") {
-      try {
-        updateWalletBalance(betAmount.toString(), outcome);
-        console.log("LOSS update wallet balance called");
-        window.dispatchEvent(new Event("balance:refresh"));
-      } catch (error) {
-        console.error("Failed to update wallet balance: ", error);
-      }
-    }
-  }
 
-  const resetGame = () => {
-    setPlayerHand([]);
-    setDealerHand([]);
     setGameOver(false);
-    setResult({ type: "", message: "" });
-    setResult({ type: "", message: "" });
-    setNewGame(false);
-    setGameDeck(combinations);
+    setGameStarted(true);
     setDealerRevealed(false);
-  }
+  };
 
   const playerValue = calculateHandValue(playerHand);
   const dealerValue = calculateHandValue(dealerHand);
@@ -173,53 +183,9 @@ export default function Home() {
             : "neutral"
       : "neutral";
 
-  useEffect(() => {
-    if (playerHand.length === 0 && dealerHand.length === 0) {
-      setPlayerHand([getRandomCardFromDeck(), getRandomCardFromDeck()]);
-      setDealerHand([getRandomCardFromDeck(), getRandomCardFromDeck()]);
-      setDealerRevealed(false);
-    }
-    if (gameOver && dealerHand.length <= 5) {
-      if (betAmount === null) return;
-      switch (true) {
-        case playerValue === 21:
-          setResult({ type: "player", message: "BlackJack! Player won" });
-          updateWalletBalance((betAmount * 1.5).toFixed(2).toString(), "win");
-          console.log("Blackjack win, balance updated");
-          setTimeout(() => {
-            window.dispatchEvent(new Event("balance:refresh"));
-          }, 500);
-          break;
-        case playerValue > 21:
-          setResult({ type: "dealer", message: "Dealer Wins" });
-          handleDeposit("loss");
-          console.log("LOSS");
-          window.dispatchEvent(new Event("balance:refresh"));
-          break;
-        case dealerValue < playerValue:
-          playerStand();
-          handleDeposit("win");
-          console.log("win");
-          window.dispatchEvent(new Event("balance:refresh"));
-          break;
-        case dealerValue === playerValue && dealerHand.length <= 5:
-          setResult({ type: "", message: "Draw" });
-          break;
-        case dealerValue > playerValue && dealerValue <= 21:
-          setResult({ type: "dealer", message: "Dealer Wins" });
-          handleDeposit("loss");
-          console.log("LOSS");
-          window.dispatchEvent(new Event("balance:refresh"));
-          break;
-        default:
-          break;
-      }
-    }
-  }, [playerHand, dealerHand, gameOver]);
-
   // *** LOGIKA AKTYWNOŚCI PRZYCISKÓW ***
-  const canHit = !gameOver && !newGame;
-  const canStand = !gameOver && !newGame;
+  const canHit = !gameOver;
+  const canStand = !gameOver;
 
   return (
     <main className="home min-h-screen bg-linear-to-b from-[#102c56] via-[#0b3a6f] to-[#081c36]">

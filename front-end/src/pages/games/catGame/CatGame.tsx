@@ -1,4 +1,4 @@
-import { useEffect, useRef, forwardRef, useImperativeHandle } from "react";
+import { useEffect, useRef, type Ref, useImperativeHandle } from "react";
 import * as THREE from "three";
 import { Renderer } from "./catGameComponents/Renderer";
 import { Camera } from "./catGameComponents/Camera";
@@ -15,8 +15,12 @@ export interface CatHandle {
   initializeGame: () => void;
 }
 
-const Cat = forwardRef<CatHandle>(function Cat(_, ref) {
-  const initializeGameRef = useRef<() => void>(() => {});
+interface CatProps {
+  ref?: Ref<CatHandle>;
+}
+
+const Cat = ({ ref }: CatProps) => {
+  const initializeGameRef = useRef<() => void>(() => undefined);
 
   useImperativeHandle(ref, () => ({
     initializeGame: () => initializeGameRef.current(),
@@ -77,7 +81,7 @@ const Cat = forwardRef<CatHandle>(function Cat(_, ref) {
 
     const animate = () => {
       animateVehicles();
-      hitTest();
+      void hitTest();
       animatePlayer();
       
       // Example offsets; adjust to taste
@@ -141,6 +145,6 @@ return () => {
       </div>
     </div>
   );
-});
+};
 
 export default Cat;

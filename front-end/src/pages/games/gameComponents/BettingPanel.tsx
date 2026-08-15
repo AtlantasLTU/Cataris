@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { startRun } from "../catGame/catGameComponents/runState";
 import { useIsAuthenticated } from "../../../hooks/useAuth";
 import { useBalance } from "../../../hooks/useBalance";
@@ -16,27 +16,18 @@ interface BettingPanelProps {
 export default function BettingPanel({ children, betAmount, setBetAmount, startGame, gameOver, gameStarted}: BettingPanelProps) {
   const isAuthenticated = useIsAuthenticated();
   const { balance: accountBalance } = useBalance();
-  const [betPlaced, setBetPlaced] = useState<boolean>(false); // Track if the bet is placed
 
   const isGoButtonActive = betAmount !== null && betAmount > 0 && !gameStarted && betAmount < (accountBalance ?? 0)/3-1;
 
   const handleGoButtonClick = () => {
-    if (gameOver) {
-      //console.log(betAmount);
+    if (gameOver || isAuthenticated) {
       startGame();
       startRun(betAmount ?? 0);
-      setBetPlaced(true); // Mark that the bet has been placed
-    } else if (isAuthenticated) {
-      //console.log(betAmount);
-      startGame();
-      startRun(betAmount ?? 0);
-      setBetPlaced(true); // Mark that the bet has been placed
     }
   };
 
   useEffect(() => {
     if (gameOver) {
-      setBetPlaced(true); // Reset bet placed status when game is over
       setBetAmount(null); // Optionally reset bet amount
       
     }
@@ -73,7 +64,7 @@ export default function BettingPanel({ children, betAmount, setBetAmount, startG
             <div className="flex mt-1 p-0.5 bg-[#184890] rounded-md">
               <input
                 type="number"
-                value={betAmount === null ? "" : betAmount}
+                value={betAmount ?? ""}
                 onChange={(e) =>
                   setBetAmount(
                     e.target.value === "" ? null : Number(e.target.value)
@@ -153,8 +144,8 @@ export default function BettingPanel({ children, betAmount, setBetAmount, startG
         </div>
 
         {/* RIGHT PANEL – STÓŁ */}
-        <div className={`bg-[#184890] relative w-full md:rounded-tr-4xl flex items-center justify-center border-r border-t border-white/10 ${!betPlaced ? 'pointer-events-none' : ''}`}>
-          {!betPlaced && (
+        <div className={`bg-[#184890] relative w-full md:rounded-tr-4xl flex items-center justify-center border-r border-t border-white/10 ${!gameStarted ? 'pointer-events-none' : ''}`}>
+          {!gameStarted && (
             <div
               className="absolute w-full h-full flex items-center justify-center text-2xl font-bold text-white md:rounded-tr-4xl bg-[#184890] z-20 pointer-none"
             >

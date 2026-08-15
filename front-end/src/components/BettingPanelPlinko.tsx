@@ -76,7 +76,7 @@ export default function BettingPanel({ children, betAmount, setBetAmount, startG
             <div className="flex mt-1 p-0.5 bg-[#184890] rounded-md">
               <input
                 type="number"
-                value={betAmount === null ? "" : betAmount}
+                value={betAmount ?? ""}
                 onChange={(e) =>
                   setBetAmount(
                     e.target.value === "" ? null : Number(e.target.value)

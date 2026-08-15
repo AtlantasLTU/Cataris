@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import TreatBettingPanel from '../../../components/TreatBettingPanel';
 import TreatBoard from './TreatBoard';
 import type { TreatCellData } from './TreatCell';
@@ -42,7 +42,8 @@ const Treat = () => {
   const [betAmount, setBetAmount] = useState<number | null>(null);
   const [mineCount, setMineCount] = useState(DEFAULT_MINES);
   const [autoCashout, setAutoCashout] = useState(0);
-  const [{ grid, safeCells }, setGridState] = useState(() => createGrid(DEFAULT_MINES));
+  const [gridState, setGridState] = useState(() => createGrid(DEFAULT_MINES));
+  const { grid, safeCells } = gridState;
   const [revealedSafes, setRevealedSafes] = useState(0);
   const [roundFinished, setRoundFinished] = useState(false);
   const [outcome, setOutcome] = useState<'win' | 'lose' | 'stopped' | null>(null);
@@ -50,7 +51,7 @@ const Treat = () => {
   const [warning, setWarning] = useState<string | null>(null);
   const isAuthenticated = useIsAuthenticated();
   const { showLogin, showRegister, closeAuthModal } = useAuthModal("/games/treat");
-  const [settled, setSettled] = useState(false);
+  const settledRef = useRef(false);
 
   const gameActive = gameStarted && !roundFinished;
   const hasBet = betAmount !== null && betAmount > 0;
@@ -69,7 +70,7 @@ const Treat = () => {
     setRoundFinished(false);
     setGameStarted(true);
     setWarning(null);
-    setSettled(false);
+    settledRef.current = false;
   }, [hasBet, mineCount]);
 
   const disableReveals = useMemo(
@@ -165,31 +166,32 @@ const Treat = () => {
     return Number.isFinite(value) ? Number(value.toFixed(2)) : 0;
   }, [betAmount, hasBet, multiplier, outcome]);
 
-  useEffect(() => {
+useEffect(() => {
     if (!roundFinished) return;
-    if (settled) return;
+    if (settledRef.current) return;
     if (!hasBet || betAmount == null || outcome == null) return;
 
-    setSettled(true);
-    if (outcome === 'lose') {
-      const finalValue = betAmount.toFixed(2).toString();
-      updateWalletBalance(finalValue, "loss");
-      console.log("Final Value on Lose:", finalValue);
-      setTimeout(() => {
+    settledRef.current = true;
+
+    const settleRound = async () => {
+      if (outcome === 'lose') {
+        const finalValue = betAmount.toFixed(2).toString();
+        await updateWalletBalance(finalValue, "loss");
+        console.log("Final Value on Lose:", finalValue);
         window.dispatchEvent(new Event("balance:refresh"));
-      }, 50);
-      return;
-    }
-    if (outcome === 'win') {
-      const finalValue = (betAmount * multiplier - betAmount).toFixed(2).toString();
-      console.log("Final Value on Win:", finalValue);
-      updateWalletBalance(finalValue, "win");
-      setTimeout(() => {
+        return;
+      }
+      if (outcome === 'win') {
+        const finalValue = (betAmount * multiplier - betAmount).toFixed(2).toString();
+        console.log("Final Value on Win:", finalValue);
+        await updateWalletBalance(finalValue, "win");
         window.dispatchEvent(new Event("balance:refresh"));
-      }, 50);
-      return;
-    }
-  }, [roundFinished, settled, hasBet, betAmount, outcome, multiplier]);
+        return;
+      }
+    };
+
+    void settleRound();
+  }, [roundFinished, hasBet, betAmount, outcome, multiplier]);
 
   return (
     <main className="home flow">

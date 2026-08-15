@@ -14,17 +14,16 @@ import { useAuthModal } from "../hooks/useAuthModal";
 import { useIsAuthenticated } from "../hooks/useAuth";
 //import yarnBall from "../assets/ball.svg"; // <- tu podmień ścieżkę
 
+const multipliers = [16, 9, 2, 1.4, 1.4, 1.2, 1.1, 1, 0.5, 1, 1.1, 1.2, 1.4, 1.4, 2, 9, 16];
+
 export default function PlinkoGame() {
-  const [ballManager, setBallManager] = useState<BallManager>();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);;
   const { showLogin, showRegister, closeAuthModal } = useAuthModal("/games/plinko");
   const [betAmount, setBetAmount] = useState<number | null>(null);
   const [gameOver, setGameOver] = useState(false);
   const isAuthenticated = useIsAuthenticated();
   const lastBetRef = useRef<number | null>(null);
-
-  // Multipliers aligned with sinks (left to right)
-  const multipliers = [16, 9, 2, 1.4, 1.4, 1.2, 1.1, 1, 0.5, 1, 1.1, 1.2, 1.4, 1.4, 2, 9, 16];
+  const ballManagerRef = useRef<BallManager | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -67,19 +66,25 @@ export default function PlinkoGame() {
     ro.observe(parent);
     window.addEventListener('resize', resize);
     
-    const manager = new BallManager(canvas, async (sinkIndex) => {
+    const manager = new BallManager(canvas, (sinkIndex) => {
       const wager = lastBetRef.current;
       if (wager === null || sinkIndex === undefined || sinkIndex < 0 || sinkIndex >= multipliers.length) return;
-      const multiplier = multipliers[sinkIndex];
-      const payout = (wager * multiplier).toFixed(2).toString();
-      await updateWalletBalance(payout, "win");
-      window.dispatchEvent(new Event("balance:refresh"));
+      
+      const settle = async () => {
+        const multiplier = multipliers[sinkIndex];
+        const payout = (wager * multiplier).toFixed(2).toString();
+        await updateWalletBalance(payout, "win");
+        window.dispatchEvent(new Event("balance:refresh"));
+      };
+
+      void settle();
     });
-    setBallManager(manager);
+    ballManagerRef.current = manager;
 
     return () => {
       ro.disconnect();
       window.removeEventListener('resize', resize);
+      ballManagerRef.current = null;
       manager.stop();
     };
   }, [canvasRef]);
@@ -90,6 +95,7 @@ export default function PlinkoGame() {
   }
 
   const dropBall = async () => {
+    const ballManager = ballManagerRef.current;
     if (!ballManager || betAmount === null || betAmount <= 0) return;
 
     // Deduct wager upfront
@@ -146,7 +152,6 @@ export default function PlinkoGame() {
     const clamped = Math.max(minX, Math.min(maxX, chosen));
 
     // Debug: log which sink is being targeted
-    const multipliers = [16, 9, 2, 1.4, 1.4, 1.2, 1.1, 1, 0.5, 1, 1.1, 1.2, 1.4, 1.4, 2, 9, 16];
     console.log(`Targeting sink ${chosenIndex} (${multipliers[chosenIndex]}x), weight: ${weights[chosenIndex]}`);
     console.log(`All sink positions: ${sinkCenters.map((x, i) => `[${i}]=${x.toFixed(1)}`).join(', ')}`);
     // BallManager expects padded coordinates; pad the chosen center and pass target index
@@ -173,7 +178,7 @@ export default function PlinkoGame() {
       )}
       <div className="w-full flex items-center justify-center py-4">
         <div className="flex items-center justify-center w-full max-w-7xl px-2 sm:px-4">
-          <BettingPanel betAmount={betAmount} setBetAmount={setBetAmount} startGame={resetGame} dropBall={dropBall} gameOver={gameOver}>
+          <BettingPanel betAmount={betAmount} setBetAmount={setBetAmount} startGame={resetGame} dropBall={() => void dropBall()} gameOver={gameOver}>
             {/* <div className="w-full h-full sm:rounded-none md:rounded-tr-2xl flex justify-center items-center relative"> */}
             <canvas
               ref={canvasRef}

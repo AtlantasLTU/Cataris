@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useMemo, useState, type CSSProperties } from 'react';
 import BettingPanelDice from '../components/BettingPanelDice';
 import sliderBase from '../assets/Dice/Rectangle 62.svg';
 import sliderHandle from '../assets/Dice/btn.svg';
@@ -31,14 +31,9 @@ const Dice = () => {
     () => (chance > 0 ? Number(((100 / chance) * (1 - HOUSE_EDGE)).toFixed(2)) : Infinity),
     [chance]
   );
-  const clampToRange = (value: number) => Math.min(100, Math.max(1, Math.round(value)));
-  const markerPercent = useMemo(() => Math.min(99, Math.max(1, markerValue)), [markerValue]);
-
-  useEffect(() => {
-    if (!isRolling && finalValue === null) {
-      setMarkerValue(clampToRange(chance));
-    }
-  }, [chance, finalValue, isRolling]);
+  const clampToRange = (value: number) => Math.min(100, Math.max(1, Math.round(value)));  
+  const displayValue = isRolling || finalValue !== null ? markerValue : clampToRange(chance);
+  const markerPercent = useMemo(() => Math.min(99, Math.max(1, displayValue)), [displayValue]);
 
   const handleRoll = (): Promise<'win' | 'loss'> => {
     if (isRolling) return Promise.resolve(outcome ?? 'loss');
@@ -110,7 +105,7 @@ const Dice = () => {
       <div className="dice-page">
         <div className="flex w-screen min-h-screen justify-center items-start ">
           <div className="w-full flex justify-center">
-            <BettingPanelDice betAmount={betAmount} setBetAmount={setBetAmount} startGame={handleRoll} gameOver={gameOver} gameStarted={gameStarted} multiplier={multiplier}>
+            <BettingPanelDice betAmount={betAmount} setBetAmount={setBetAmount} startGame={() => void handleRoll()} gameOver={gameOver} gameStarted={gameStarted} multiplier={multiplier}>
               <div className="dice-panel">
                 <section className="dice-slider">
                   <div
@@ -136,7 +131,7 @@ const Dice = () => {
                             className={`chance-marker ${isRolling ? 'rolling' : outcome ?? ''}`}
                             style={{ '--marker-position': `${markerPercent}` } as CSSProperties}
                           >
-                            <span>{markerValue}%</span>
+                            <span>{displayValue}%</span>
                           </div>
                         </div>
                         <div className={`chance-handle ${isRolling ? 'rolling' : ''}`}>
@@ -180,7 +175,7 @@ const Dice = () => {
                           ? ''
                           : finalValue !== null
                             ? outcome === 'win'
-                              ? `Win! Payout ${payoutAmount !== null ? payoutAmount : '—'}`
+                              ? `Win! Payout ${payoutAmount ?? '—'}`
                               : 'Lost...'
                             : 'Set your odds and roll the dice.'}
                       </div>

@@ -22,25 +22,25 @@ export default function BettingPanelDice({
 }: BettingPanelDiceProps) {
   const [balance, setBalance] = useState<number>(0);
   const [mode, setMode] = useState("manual");
-  const [betPlaced, setBetPlaced] = useState<boolean>(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    if (!token) return;
 
-    if (token) {
-      const getBalance = async () => {
-        const result = await fetchWalletBalance();
-        if ("balance" in result) {
-          setBalance(result.balance);
-          console.log("Account Balance in BettingPanelDice:", result.balance);
-        } else {
-          console.error("Failed to fetch wallet balance:", result.message);
-        }
-      };
-      getBalance();
-      window.addEventListener("balance:refresh", getBalance);
-      return () => window.removeEventListener("balance:refresh", getBalance);
-    }
+    const getBalance = async () => {
+      const result = await fetchWalletBalance();
+      if ("balance" in result) {
+        setBalance(result.balance);
+      } else {
+        console.error("Failed to fetch wallet balance:", result.message);
+      }
+    };
+
+    const onRefresh = () => void getBalance();
+
+    onRefresh();
+    window.addEventListener("balance:refresh", onRefresh);
+    return () => window.removeEventListener("balance:refresh", onRefresh);
   }, []);
 
   const isGoButtonActive =
@@ -54,14 +54,11 @@ export default function BettingPanelDice({
   const handleGoButtonClick = () => {
     if (isGoButtonActive) {
       startGame();
-      setBetPlaced(true);
-      console.log(betPlaced);
     }
   };
 
   useEffect(() => {
     if (gameOver) {
-      setBetPlaced(false);
       setBetAmount(null);
     }
   }, [gameOver, setBetAmount]);
@@ -95,7 +92,7 @@ export default function BettingPanelDice({
             <div className="flex mt-1 p-0.5 bg-[#184890] rounded-md">
               <input
                 type="number"
-                value={betAmount === null ? "" : betAmount}
+                value={betAmount ?? ""}
                 onChange={(e) =>
                   setBetAmount(e.target.value === "" ? null : Number(e.target.value))
                 }

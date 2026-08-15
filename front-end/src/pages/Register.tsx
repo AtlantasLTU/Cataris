@@ -55,13 +55,13 @@ const Register: React.FC<RegisterProps> = ({ onClose }) => {
         navigate('/');
         */
         }
-        catch (error: any) {
-            setError(error.message || "Registration failed. Please try again");
+        catch (err: unknown) {
+            setError(err instanceof Error ? err.message : "Registration failed. Please try again");
         }
     }
     return (
         <div className='flex justify-center items-center h-screen bg-gray 100'>
-            <form onSubmit={handleSubmit} className='bg-white text-black p-6 shadow-lg rounded-lg w-96'>
+            <form onSubmit={(e) => void handleSubmit(e)} className='bg-white text-black p-6 shadow-lg rounded-lg w-96'>
                 <h2 className="text-2x1 font-bold mb-4 text-center">Register</h2>
                 {error && <p className='text-red-500 text-center'>{error}</p>}
                 <div className='mb-4'>

@@ -36,15 +36,13 @@ export default function TreatBettingPanel({ children, betAmount, setBetAmount, s
           console.error("Failed to fetch wallet balance:", result.message);
         }
       };
-      getBalance();
-      window.addEventListener("balance:refresh", getBalance);
-      return () => window.removeEventListener("balance:refresh", getBalance);
+      const onRefresh = () => void getBalance();
+
+      onRefresh();
+      window.addEventListener("balance:refresh", onRefresh);
+      return () => window.removeEventListener("balance:refresh", onRefresh);
     }
   }, []);
-
-  useEffect(() => {
-    setAutoCashoutInput(autoCashout.toString());
-  }, [autoCashout]);
 
   const isGoButtonActive = betAmount !== null && betAmount > 0 && betAmount <= balance;
 
@@ -92,7 +90,7 @@ export default function TreatBettingPanel({ children, betAmount, setBetAmount, s
             <div className="flex mt-1 p-0.5 bg-[#184890] rounded-md">
               <input
                 type="number"
-                value={betAmount === null ? "" : betAmount}
+                value={betAmount ?? ""}
                 onChange={(e) =>
                   setBetAmount(
                     e.target.value === "" ? null : Number(e.target.value)

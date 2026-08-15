@@ -47,14 +47,14 @@ const Login: React.FC<LoginProps> = ({ onClose }) => {
                 throw new Error('Invalid response data');
             }
                 */
-        } catch (error: any) {
+        } catch (error: unknown) {
             // Set the error state if any issue happens
-            setError(error.message || 'Login failed');
+            setError(error instanceof Error ? error.message : 'Login failed');
         }
     };
     return (
         <div className='flex justify-center items-center h-screen bg-gray 100'>
-            <form onSubmit={handleSubmit} className='bg-white text-black p-6 shadow-lg rounded-lg w-96'>
+            <form onSubmit={(e) => void handleSubmit(e)} className='bg-white text-black p-6 shadow-lg rounded-lg w-96'>
                 <h2 className="text-2x1 font-bold mb-4 text-center">Login</h2>
                 {error && <p className='text-red-500 text-center'>{error}</p>}
                 <div className='mb-4 relative'>

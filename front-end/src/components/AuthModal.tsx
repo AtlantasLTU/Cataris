@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
@@ -6,16 +5,15 @@ import Register from "../pages/Register";
 export default function AuthModal() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const [auth, setAuth] = useState<"login"|"register"|null>(null);
 
-  useEffect(() => {
-    const a = params.get("auth");
-    setAuth(a === "login" || a === "register" ? a : null);
-  }, [params]);
+  const a = params.get("auth");
+  const auth = a === "login" || a === "register" ? a : null;
 
   if (!auth) return null;
 
-  const close = () => navigate(".", { replace: true });
+  const close = () => {
+    void navigate(".", { replace: true });
+  };
 
   return (
     <div className="auth-modal-backdrop" onClick={close}>

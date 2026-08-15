@@ -5,7 +5,11 @@ import type { MoveDirection } from "./types";
 import { updateRow, updatedRows} from "./Map";
 import {hitTest} from "./hitTest";
 
-const g = globalThis as any;
+interface CatGlobal {
+  __CAT_PLAYER__?: THREE.Group;
+}
+
+const g = globalThis as unknown as CatGlobal;
 
 export const player: THREE.Group = g.__CAT_PLAYER__ ?? (g.__CAT_PLAYER__ = Player());
 
@@ -222,7 +226,7 @@ export function stepCompleted() {
 //  if (direction === "backward") position.currentRow -= 1;
 /*   if (direction === "left") position.currentTile -= 1;
   if (direction === "right") position.currentTile += 1; */
-  hitTest();
+  void hitTest();
 
 /*   // Add new rows if the player is running out of them
   if (position.currentRow > rows.length - 10) addRows(); */

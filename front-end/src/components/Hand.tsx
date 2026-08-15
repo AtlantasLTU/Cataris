@@ -1,10 +1,11 @@
 import React from "react";
-import Card from "./Card";
+import CardComponent from "./Card";
 import { motion } from "framer-motion";
 import backCard from "../assets/Cards/BackCard.svg";
+import type { Card } from "../assets/CardDeck";
 
 interface HandProps {
-    cards: any[];
+    cards: Card[];
     title: string;
     handValue: number;
     hideFirstCard?: boolean;
@@ -48,14 +49,16 @@ export default function Hand({
                         marginTop: index * 6,              // każda kolejna o 6px niżej
                     };
 
+                    const cardKey = `${card.suit}-${card.rank}`;
+
                     if (hideFirstCard && index === 0) {
                         // zakryta pierwsza karta dealera
                         return (
                             <motion.img
-                                key={`hidden-${index}`}
+                                key={cardKey}
                                 src={backCard}
                                 alt="Hidden card"
-                                className="w-20 h-[120px] rounded-lg"
+                                className="w-20 h-30 rounded-lg"
                                 style={style}
                             />
                         );
@@ -63,8 +66,8 @@ export default function Hand({
 
                     // zwykła karta
                     return (
-                        <div key={index} style={style}>
-                            <Card card={card} status={status} />
+                        <div key={cardKey} style={style}>
+                            <CardComponent card={card} status={status} />
                         </div>
                     );
                 })}

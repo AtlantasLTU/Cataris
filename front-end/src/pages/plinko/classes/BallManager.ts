@@ -28,7 +28,7 @@ export class BallManager {
         this.ctx.clearRect(0, 0, canvasRef.width, canvasRef.height);
         this.obstacles = createObstacles();
         this.sinks = createSinks();
-        this.sinkOffsets = new Array(this.sinks.length).fill(0);
+        this.sinkOffsets = new Array<number>(this.sinks.length).fill(0);
         this.update();
         this.onFinish = onFinish;
     }

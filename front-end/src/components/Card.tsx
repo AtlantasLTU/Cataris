@@ -1,6 +1,5 @@
 import React from "react";
-import { motion } from "framer-motion";
-
+import { motion, type Variants, type TargetAndTransition } from "framer-motion";
 
 interface CardProps {
   card: {
@@ -11,13 +10,25 @@ interface CardProps {
   flipped?: boolean;
 }
 
-const cardVariants = {
-  hidden: {
-    opacity: 0,
-    y: -30,
-    scale: 0.9,
-    rotate: -5,
-  },
+interface CardWrapperProps {
+  children: React.ReactNode;
+  borderClass: string;
+  baseShadow: string;
+  winPulse: TargetAndTransition;
+}
+
+const CardWrapper: React.FC<CardWrapperProps> = ({ children, borderClass, baseShadow, winPulse }) => (
+  <motion.div
+    className={`card flex flex-col items-center rounded-xl ${borderClass}`}
+    style={{ boxShadow: baseShadow }}
+    animate={winPulse}
+  >
+    {children}
+  </motion.div>
+);
+
+const cardVariants: Variants = {
+  hidden: { opacity: 0, y: -30, scale: 0.9, rotate: -5 },
   visible: {
     opacity: 1,
     y: 0,
@@ -80,49 +91,34 @@ const Card: React.FC<CardProps> = ({
         }
         : {};
 
-  // wrapper ma box-shadow, IMG jest statyczne
-  const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-    <motion.div
-      className={`card flex flex-col items-center rounded-xl ${borderClass}`}
-      style={{ boxShadow: baseShadow }}
-      animate={winPulse}
-    >
-      {children}
-    </motion.div>
-  );
-
   // FLIP dla dealera
   if (flipped) {
     return (
-      <Wrapper>
+      <CardWrapper borderClass={borderClass} baseShadow={baseShadow} winPulse={winPulse}>
         <motion.img
           src={imgPath}
           alt={`${card.rank} of ${card.suit}`}
           className="w-20 h-auto rounded-lg"
           initial={{ rotateY: 90, opacity: 0 }}
-          animate={{
-            rotateY: 0,
-            opacity: 1,
-            transition: { duration: 0.4 },
-          }}
+          animate={{ rotateY: 0, opacity: 1, transition: { duration: 0.4 } }}
           style={{ transformStyle: "preserve-3d" }}
         />
-      </Wrapper>
+      </CardWrapper>
     );
   }
 
   // Zwykła karta
   return (
-    <Wrapper>
+    <CardWrapper borderClass={borderClass} baseShadow={baseShadow} winPulse={winPulse}>
       <motion.img
         src={imgPath}
         alt={`${card.rank} of ${card.suit}`}
         className="w-20 h-auto rounded-lg"
-        variants={cardVariants as any}
+        variants={cardVariants}
         initial="hidden"
         animate="visible"
       />
-    </Wrapper>
+    </CardWrapper>
   );
 };
 
