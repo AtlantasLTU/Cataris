@@ -2,8 +2,7 @@
 import './Games.css';
 import Login from "./Login";
 import Register from "./Register";
-import { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 // Import game images
 import gameCat from '../assets/games/game-cat.png';
@@ -12,6 +11,7 @@ import gameTreat from '../assets/games/game-treat.png';
 import gameMeowJack from '../assets/games/game-meowjack.png';
 import gamePlinko from '../assets/games/Plinko.png';
 import gameRoulette from '../assets/games/Roulette.png';
+import { useAuthModal } from '../hooks/useAuthModal';
 
 
 interface Game {
@@ -56,20 +56,7 @@ const games: Game[] = [
 
 
 export default function Games() {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const [showLogin, setShowLogin] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
-  useEffect(() => {
-    const auth = searchParams.get("auth");
-    setShowLogin(auth === "login");
-    setShowRegister(auth === "register");
-  }, [searchParams]);
-  const closeAuthModal = () => {
-    setShowLogin(false);
-    setShowRegister(false);
-    void navigate("/games", { replace: true }); // clears ?auth=...
-  };
+  const { showLogin, showRegister, closeAuthModal } = useAuthModal("/games");
   return (
     <div className="games-container">
       <div className="games-header">

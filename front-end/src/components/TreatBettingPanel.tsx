@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { fetchWalletBalance } from "../api/auth";
 
-type BettingPanelProps = {
+interface BettingPanelProps {
   children?: ReactNode;
   betAmount: number | null;
   setBetAmount: (amount: number | null) => void;
@@ -16,7 +16,7 @@ type BettingPanelProps = {
   setMineCount: (value: number) => void;
   profit: number;
   multiplier: number;
-};
+}
 
 export default function TreatBettingPanel({ children, betAmount, setBetAmount, startGame, gameOver: _gameOver, gameStarted, gameActive, onCashOut, autoCashout, setAutoCashout, mineCount, setMineCount, profit, multiplier }: BettingPanelProps) {
   const [balance, setBalance] = useState<number>(0);

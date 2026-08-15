@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import './promotion.css';
 import Login from "./Login";
 import Register from "./Register";
@@ -12,6 +10,7 @@ import promo3 from '../assets/Promotion/3rd-promotion.png';
 import promo4 from '../assets/Promotion/4th-promotion.png';
 import promo5 from '../assets/Promotion/5th-promotion.png';
 import banner from '../assets/Promotion/promotion-banner.png';
+import { useAuthModal } from "../hooks/useAuthModal";
 
 interface Promotion {
   id: number;
@@ -60,20 +59,7 @@ const promotionsData: Promotion[] = [
 ];
 
 export default function Promotions() {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const [showLogin, setShowLogin] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
-  useEffect(() => {
-    const auth = searchParams.get("auth");
-    setShowLogin(auth === "login");
-    setShowRegister(auth === "register");
-  }, [searchParams]);
-  const closeAuthModal = () => {
-    setShowLogin(false);
-    setShowRegister(false);
-    void navigate("/promotions", { replace: true }); // clears ?auth=...
-  };
+  const { showLogin, showRegister, closeAuthModal } = useAuthModal("/promotions");
   return (
     <main className="promotions">
       {/* BANNER */}

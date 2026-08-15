@@ -1,54 +1,25 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { fetchWalletBalance } from "../api/auth";
+import { useIsAuthenticated } from "../hooks/useAuth";
+import { useBalance } from "../hooks/useBalance";
 
-type BettingPanelProps = {
+interface BettingPanelProps {
   children?: ReactNode;
   betAmount: number | null;
   setBetAmount: (amount: number | null) => void;
   startGame: () => void;
   gameOver: boolean;
   gameStarted: boolean;
-};
+}
 
 
 export default function BettingPanel({ children, betAmount, setBetAmount, startGame, gameOver, gameStarted}: BettingPanelProps) {
-  const [balance, setBalance] = useState<number>(0.0); 
   const [mode, setMode] = useState("manual");
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const isAuthenticated = useIsAuthenticated();
+  const { balance: accountBalance } = useBalance();
   const [betPlaced, setBetPlaced] = useState<boolean>(false); // Track if the bet is placed
 
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const authenticated = !!token
-    setIsAuthenticated(authenticated);
-
-    if (!authenticated) return;
-
-    const getBalance = async () => {
-      const result = await fetchWalletBalance();
-      if ('balance' in result) {
-        setBalance(parseFloat(result.balance.toFixed(2)));
-        console.log('Account Balance in BettingPanel:', result.balance);
-      } else {
-        console.error("Failed to fetch wallet balance:", result.message);
-      }
-    };
-    getBalance();
-
-    const handleBalanceRefresh = () => {
-      getBalance();
-    }
-    // Fetch user balance if authenticated
-    window.addEventListener("balance:refresh", handleBalanceRefresh);
-
-    return () => {
-      window.addEventListener("balance:refresh", handleBalanceRefresh);
-    }
-  }, []);
-
-
-  const isGoButtonActive = betAmount !== null && betAmount > 0 && !gameStarted && betAmount <= balance;
+  const isGoButtonActive = betAmount !== null && betAmount > 0 && !gameStarted && betAmount <= (accountBalance ?? 0);
 
   const handleGoButtonClick = () => {
     if (gameOver) {

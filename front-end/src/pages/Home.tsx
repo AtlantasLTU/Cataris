@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Home.css";
 import Login from "./Login";
 import Register from "./Register";
@@ -12,23 +11,13 @@ import gameMice from '../assets/games/game-mice.png';
 import gameTreat from '../assets/games/game-treat.png';
 import gameMeowJack from '../assets/games/game-meowjack.png';
 import sponsorLogo from '../assets/LOGO.svg'; // Using existing logo as sponsor logo
+import { useAuthModal } from "../hooks/useAuthModal";
 
 
 export default function Home() {
-  const [searchParams] = useSearchParams();
+  const { showLogin, showRegister, closeAuthModal } = useAuthModal("/");
   const navigate = useNavigate();
-  const [showLogin, setShowLogin] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
-  useEffect(() => {
-    const auth = searchParams.get("auth");
-    setShowLogin(auth === "login");
-    setShowRegister(auth === "register");
-  }, [searchParams]);
-  const closeAuthModal = () => {
-    setShowLogin(false);
-    setShowRegister(false);
-    void navigate("/", { replace: true }); // clears ?auth=...
-  };
+  
   return (
     <main className="home">
 

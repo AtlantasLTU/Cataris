@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import "./BettingPanel.css";
 import Login from "../../Login";
 import Register from "../../Register";
@@ -7,6 +6,8 @@ import BettingPanel from "../gameComponents/BettingPanel";
 import Cat, { type CatHandle } from "./CatGame";
 import logo from "../../../assets/LOGO.svg";
 import cat from "../../../assets/games/game-cat.png";
+import { useAuthModal } from "../../../hooks/useAuthModal";
+import { useIsAuthenticated } from "../../../hooks/useAuth";
 
 // png imports
 export default function Home() {
@@ -15,22 +16,8 @@ export default function Home() {
   const [betAmount, setBetAmount] = useState<number | null>(null);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameOver, setGameOver] = useState(false);
-
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const [showLogin, setShowLogin] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  useEffect(() => {
-    const auth = searchParams.get("auth");
-    setShowLogin(auth === "login");
-    setShowRegister(auth === "register");
-  }, [searchParams]);
-  const closeAuthModal = () => {
-    setShowLogin(false);
-    setShowRegister(false);
-    void navigate("/", { replace: true }); // clears ?auth=...
-  };
+  const isAuthenticated = useIsAuthenticated();
+  const { showLogin, showRegister, closeAuthModal } = useAuthModal("/games/cat");
 
   const startGame = () => {
     if (!isAuthenticated) return;
@@ -40,10 +27,7 @@ export default function Home() {
     catRef.current?.initializeGame();
     // Add your game starting logic here
   };
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsAuthenticated(!!token);
-  }, []);
+
   useEffect(() => {
       const handleGameOver = () => {
         console.log("over!");
@@ -53,6 +37,7 @@ export default function Home() {
       window.addEventListener("game:over", handleGameOver);
       return () => window.removeEventListener("game:over", handleGameOver);
   }, []);
+  
   return (
     <main className="home">
       {!isAuthenticated && (

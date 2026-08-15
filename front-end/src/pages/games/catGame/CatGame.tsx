@@ -11,9 +11,9 @@ import { hitTest } from "./catGameComponents/hitTest";
 import "./catGameComponents/cat.css";
 
 
-export type CatHandle = {
+export interface CatHandle {
   initializeGame: () => void;
-};
+}
 
 const Cat = forwardRef<CatHandle>(function Cat(_, ref) {
   const initializeGameRef = useRef<() => void>(() => {});

@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { NavLink, Link, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { NavLink, Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import "./Navbar.css";
 import icHome from "../assets/house.png";
@@ -9,38 +9,21 @@ import icWallet from "../assets/wallet.png";
 import icSettings from "../assets/settings.png";
 import icAccount from "../assets/account.png";
 import Cataris_coin from "../assets/Cataris_coin.svg";
-import { refreshBalance } from "../components/refreshBalance";
+import { useIsAuthenticated } from "../hooks/useAuth";
+import { useBalance } from "../hooks/useBalance";
+import { clearToken } from "../auth/tokenStore";
 
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [accountBalance, setAccountBalance] = useState<number | null>(null);
+  const isAuthenticated = useIsAuthenticated();
+  const { balance: accountBalance } = useBalance();
   const location = useLocation();
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsAuthenticated(!!token);
-    if (token) {
-      refreshBalance(setAccountBalance);
-    }
-  }, []);
-  useEffect(() => {
-  const onBalanceRefresh = () => {
-    const token = localStorage.getItem("token");
-    if (token) refreshBalance(setAccountBalance);
-  };
-  
-
-  window.addEventListener("balance:refresh", onBalanceRefresh);
-  return () => window.removeEventListener("balance:refresh", onBalanceRefresh);
-}, []);
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    setIsAuthenticated(false); // Update state after logout
-    console.log("User logged out successfully");
-    window.location.reload();
+    clearToken();
+    void navigate("/");
   };
 
   const authLink = (value: "login" | "register") => {
@@ -80,7 +63,7 @@ export default function Navbar() {
           </>
         ) : (
           <>
-          <label className="flex items-center space-x-2 bg-blue-950 text-white w-auto font-bold px-3 py-1.5 rounded-lg shadow-md hover:shadow-lg w-max">
+          <label className="flex items-center space-x-2 bg-blue-950 text-white w-auto font-bold px-3 py-1.5 rounded-lg shadow-md hover:shadow-lg">
           <span className="flex-1 text-sm">
             {accountBalance !== null ? `$${accountBalance.toFixed(2)}` : 'Loading...'}
           </span>
@@ -138,16 +121,16 @@ export default function Navbar() {
           <div className="sideMenu__divider" />
           {!isAuthenticated ? (
             <>
-              <NavLink to="/?auth=login" className="slink btnlike !bg-white !text-black hover:!bg-gray-400 p-2 rounded" onClick={() => setOpen(false)}>
+              <NavLink to="/?auth=login" className="slink btnlike bg-white! text-black! hover:bg-gray-400! p-2 rounded" onClick={() => setOpen(false)}>
                 LOGIN
               </NavLink>
-              <NavLink to="/?auth=register" className="slink btnlike !bg-blue-500 !text-white hover:!bg-blue-700 p-2 rounded" onClick={() => setOpen(false)}>
+              <NavLink to="/?auth=register" className="slink btnlike bg-blue-500! text-white! hover:bg-blue-700! p-2 rounded" onClick={() => setOpen(false)}>
                 REGISTER
               </NavLink>
             </>
           ) : (
             <>
-              <button className="slink btnlike !bg-red-500 text-white hover:!bg-red-700 p-2 rounded" onClick={handleLogout}>
+              <button className="slink btnlike bg-red-500! text-white hover:bg-red-700! p-2 rounded" onClick={handleLogout}>
                 LOGOUT
               </button>
             </>

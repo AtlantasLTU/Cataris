@@ -2,26 +2,12 @@
 import './Games.css';
 import Login from "./Login";
 import Register from "./Register";
-import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import logo from "../assets/LOGO.svg"
+import { useAuthModal } from '../hooks/useAuthModal';
 
 
 export default function Games() {
-    const [searchParams] = useSearchParams();
-    const navigate = useNavigate();
-    const [showLogin, setShowLogin] = useState(false);
-    const [showRegister, setShowRegister] = useState(false);
-    useEffect(() => {
-        const auth = searchParams.get("auth");
-        setShowLogin(auth === "login");
-        setShowRegister(auth === "register");
-    }, [searchParams]);
-    const closeAuthModal = () => {
-        setShowLogin(false);
-        setShowRegister(false);
-        void navigate("/games/roulette", { replace: true }); // clears ?auth=...
-    };
+    const { showLogin, showRegister, closeAuthModal } = useAuthModal("/games/roulette");
     return (
         <main className="home flow">
             <div className="fixed inset-0 bg-linear-to-b from-[#102c56] via-[#0b3a6f] to-[#081c36] z-10 flex items-center justify-center">

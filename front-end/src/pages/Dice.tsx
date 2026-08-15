@@ -4,12 +4,13 @@ import sliderBase from '../assets/Dice/Rectangle 62.svg';
 import sliderHandle from '../assets/Dice/btn.svg';
 import './Dice.css';
 import logo from "../assets/LOGO.svg";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import Login from "./Login";
 import Register from "./Register";
 import { updateWalletBalance } from "../api/auth";
-import { fetchWalletBalance } from "../api/auth";
 import mice from '../assets/games/game-mice.png';
+import { useAuthModal } from '../hooks/useAuthModal';
+import { useIsAuthenticated } from '../hooks/useAuth';
+import { useBalance } from '../hooks/useBalance';
 
 const Dice = () => {
   const [chance, setChance] = useState(50);
@@ -21,12 +22,9 @@ const Dice = () => {
   const [betAmount, setBetAmount] = useState<number | null>(null);
   const [gameOver, setGameOver] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [showLogin, setShowLogin] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
-  const [balance, setBalance] = useState<number>(0.0);
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const { showLogin, showRegister, closeAuthModal } = useAuthModal("/games/dice");
+  const isAuthenticated = useIsAuthenticated();
+  const { balance: accountBalance } = useBalance();
 
   const HOUSE_EDGE = 0.05;
   const multiplier = useMemo(
@@ -36,43 +34,11 @@ const Dice = () => {
   const clampToRange = (value: number) => Math.min(100, Math.max(1, Math.round(value)));
   const markerPercent = useMemo(() => Math.min(99, Math.max(1, markerValue)), [markerValue]);
 
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsAuthenticated(!!token);
-
-    if (token) {
-      const getBalance = async () => {
-        const result = await fetchWalletBalance();
-        if ('balance' in result) {
-          setBalance(result.balance);
-          console.log('Account Balance in Dice:', result.balance);
-        } else {
-          console.error("Failed to fetch wallet balance:", result.message);
-        }
-      };
-      void getBalance();
-      // Fetch user balance if authenticated
-    }
-  }, []);
-
   useEffect(() => {
     if (!isRolling && finalValue === null) {
       setMarkerValue(clampToRange(chance));
     }
   }, [chance, finalValue, isRolling]);
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsAuthenticated(!!token);
-    const auth = searchParams.get("auth");
-    setShowLogin(auth === "login");
-    setShowRegister(auth === "register");
-  }, [searchParams]);
-  const closeAuthModal = () => {
-    setShowLogin(false);
-    setShowRegister(false);
-    void navigate("/games/dice", { replace: true }); // clears ?auth=...
-  };
 
   const handleRoll = (): Promise<'win' | 'loss'> => {
     if (isRolling) return Promise.resolve(outcome ?? 'loss');
@@ -84,7 +50,7 @@ const Dice = () => {
     setPayoutAmount(null);
     setFinalValue(null);
     setMarkerValue(clampToRange(chance));
-    console.log(balance);
+    console.log(accountBalance);
     const animationSteps = 14;
     let step = 0;
 

@@ -5,10 +5,11 @@ import type { TreatCellData } from './TreatCell';
 import './Treat.css';
 import Login from "../../Login";
 import Register from "../../Register";
-import { useNavigate, useSearchParams } from 'react-router-dom';
 import { updateWalletBalance } from "../../../api/auth";
 import logo from "../../../assets/LOGO.svg";
 import treat from "../../../assets/games/game-treat.png";
+import { useAuthModal } from '../../../hooks/useAuthModal';
+import { useIsAuthenticated } from '../../../hooks/useAuth';
 
 const GRID_SIZE = 5;
 const TOTAL_CELLS = GRID_SIZE * GRID_SIZE;
@@ -47,28 +48,12 @@ const Treat = () => {
   const [outcome, setOutcome] = useState<'win' | 'lose' | 'stopped' | null>(null);
   const [gameStarted, setGameStarted] = useState(false);
   const [warning, setWarning] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [showLogin, setShowLogin] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const isAuthenticated = useIsAuthenticated();
+  const { showLogin, showRegister, closeAuthModal } = useAuthModal("/games/treat");
   const [settled, setSettled] = useState(false);
 
   const gameActive = gameStarted && !roundFinished;
   const hasBet = betAmount !== null && betAmount > 0;
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsAuthenticated(!!token);
-
-  }, []);
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsAuthenticated(!!token);
-    const auth = searchParams.get("auth");
-    setShowLogin(auth === "login");
-    setShowRegister(auth === "register");
-  }, [searchParams]);
 
   const startGame = useCallback(() => {
     if (!hasBet) {
@@ -86,18 +71,11 @@ const Treat = () => {
     setWarning(null);
     setSettled(false);
   }, [hasBet, mineCount]);
-  const closeAuthModal = () => {
-    setShowLogin(false);
-    setShowRegister(false);
-    void navigate("/games/treat", { replace: true }); // clears ?auth=...
-  };
 
   const disableReveals = useMemo(
     () => roundFinished,
     [roundFinished]
   );
-
-
 
   const handleReveal = useCallback(
     (rowIndex: number, columnIndex: number) => {
@@ -195,7 +173,7 @@ const Treat = () => {
     setSettled(true);
     if (outcome === 'lose') {
       const finalValue = betAmount.toFixed(2).toString();
-      updateWalletBalance(finalValue!, "loss");
+      updateWalletBalance(finalValue, "loss");
       console.log("Final Value on Lose:", finalValue);
       setTimeout(() => {
         window.dispatchEvent(new Event("balance:refresh"));
@@ -205,7 +183,7 @@ const Treat = () => {
     if (outcome === 'win') {
       const finalValue = (betAmount * multiplier - betAmount).toFixed(2).toString();
       console.log("Final Value on Win:", finalValue);
-      updateWalletBalance(finalValue!, "win");
+      updateWalletBalance(finalValue, "win");
       setTimeout(() => {
         window.dispatchEvent(new Event("balance:refresh"));
       }, 50);

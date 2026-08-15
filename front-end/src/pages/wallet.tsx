@@ -1,39 +1,27 @@
 import { useEffect, useMemo, useState } from "react";
 import { updateWalletBalance, fetchUserInfo, fetchWalletBalance, updateUserInfo } from "../api/auth";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import Login from "./Login";
 import Register from "./Register";
 import logo from "../assets/LOGO.svg";
+import { useAuthModal } from "../hooks/useAuthModal";
+import { useIsAuthenticated } from "../hooks/useAuth";
+import { useBalance } from "../hooks/useBalance";
 
 export default function Wallet() {
-  const [searchParams] = useSearchParams();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [accountBalance, setAccountBalance] = useState<number | null>(null);
+  const [] = useSearchParams();
+  const isAuthenticated = useIsAuthenticated();
+  const { balance: accountBalance } = useBalance();
   const [loading, setLoading] = useState<boolean>(false); // For button loading state
   const [saving, setSaving] = useState<boolean>(false);
-  const [showLogin, setShowLogin] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
+  const { showLogin, showRegister, closeAuthModal } = useAuthModal("/wallet");
   const [username, setUsername] = useState<string>("-");
   const [email, setEmail] = useState<string>("-");
   const [editUsername, setEditUsername] = useState<string>("");
   const [editEmail, setEditEmail] = useState<string>("");
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
   const [depositCooldown, setDepositCooldown] = useState<number>(0); // Time remaining in seconds
-  const navigate = useNavigate();
 
-  const closeAuthModal = () => {
-    setShowLogin(false);
-    setShowRegister(false);
-    void navigate("/wallet", { replace: true }); // clears ?auth=...
-  };
-  const getBalance = async () => {
-    const result = await fetchWalletBalance();
-    if ('balance' in result) {
-      setAccountBalance(result.balance);
-    } else {
-      console.error("Failed to fetch wallet balance:", result.message);
-    }
-  };
   const getUserInfo = async () => {
     const result = await fetchUserInfo();
     if ("username" in result) {
@@ -49,24 +37,6 @@ export default function Wallet() {
   const hasChanges = useMemo(() => {
     return editUsername.trim() !== (username ?? "").trim() || editEmail.trim() !== (email ?? "").trim();
   }, [editUsername, editEmail, username, email]);
-
-  useEffect(() => {
-    const auth = searchParams.get("auth");
-    setShowLogin(auth === "login");
-    setShowRegister(auth === "register");
-    const token = localStorage.getItem("token");
-    setIsAuthenticated(!!token);
-
-    if (token) {
-      getBalance();
-      getUserInfo();
-      // Fetch user balance if authenticated
-    }
-  }, [searchParams]);
-  useEffect(() => {
-    window.addEventListener("balance:refresh", getBalance);
-    return () => window.removeEventListener("balance:refresh", getBalance);
-  }, []);
 
   // Initialize cooldown from localStorage
   useEffect(() => {
@@ -101,12 +71,9 @@ export default function Wallet() {
     setLoading(true);
     try {
       await updateWalletBalance("50", "win");
-      await getBalance();
       const result = await fetchWalletBalance();
       if ('balance' in result) {
-        setAccountBalance(result.balance);
         console.log("New balance: ", result.balance);
-        await getBalance();
         // Set 5-minute cooldown (300 seconds)
         const cooldownEnd = Date.now() + (5 * 60 * 1000);
         localStorage.setItem("depositCooldown", cooldownEnd.toString());

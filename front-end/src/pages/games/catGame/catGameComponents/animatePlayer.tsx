@@ -30,7 +30,7 @@ export function animatePlayer() {
 function setPosition(progress: number) {
   const startX = position.currentTile * tileSize;
   const startY = position.currentRow * tileSize;
-  let endX = startX;
+  const endX = startX;
   let endY = startY;
 
 /*   if (movesQueue[0] === "left") endX -= tileSize;

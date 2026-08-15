@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import "./Home.css";
 import Login from "./Login";
 import Register from "./Register";
+import { useAuthModal } from "../hooks/useAuthModal";
 // @ts-ignore
 import { combinations } from "../assets/CardDeck";
 import Hand from "../components/Hand";
@@ -11,62 +11,24 @@ import banner from "../assets/BANNER.svg";
 import cardDeck from "../assets/DECK-CARDS.svg";
 import logo from "../assets/LOGO.svg";
 import { updateWalletBalance } from "../api/auth";
-import { fetchWalletBalance } from "../api/auth";
 import meowJack from "../assets/games/game-meowjack.png";
+import { useIsAuthenticated } from "../hooks/useAuth";
+import { useBalance } from "../hooks/useBalance";
 
-type CardDeck = {
+interface CardDeck {
   suit: string;
   rank: string;
-};
+}
 
-type GameOverResult = {
+interface GameOverResult {
   type: string;
   message: string;
-};
+}
 
 export default function Home() {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const [showLogin, setShowLogin] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
-  const [balance, setBalance] = useState<number>(0.0);
-
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-
-  useEffect(() => {
-    const auth = searchParams.get("auth");
-    setShowLogin(auth === "login");
-    setShowRegister(auth === "register");
-
-    const token = localStorage.getItem("token");
-    setIsAuthenticated(!!token)
-    console.log(token)
-  }, [searchParams]);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsAuthenticated(!!token);
-
-    if (token) {
-      const getBalance = async () => {
-        const result = await fetchWalletBalance();
-        if ('balance' in result) {
-          setBalance(result.balance);
-          console.log('Account Balance in blackjack:', result.balance);
-        } else {
-          console.error("Failed to fetch wallet balance:", result.message);
-        }
-      };
-      getBalance();
-      // Fetch user balance if authenticated
-    }
-  }, []);
-
-  const closeAuthModal = () => {
-    setShowLogin(false);
-    setShowRegister(false);
-    void navigate("/games/meow-jack", { replace: true }); // clears ?auth=...
-  };
+  const { showLogin, showRegister, closeAuthModal } = useAuthModal("/games/meow-jack");
+  const isAuthenticated = useIsAuthenticated();
+  const { balance: accountBalance } = useBalance();
 
   const [gameDeck, setGameDeck] = useState<CardDeck[]>(combinations);
   const [playerHand, setPlayerHand] = useState<CardDeck[]>([]);
@@ -87,7 +49,7 @@ export default function Home() {
     const card = gameDeck[randomIndex];
     const newDeck = gameDeck.filter((_, index) => index !== randomIndex);
     setGameDeck(newDeck);
-    console.log(balance);
+    console.log(accountBalance);
     return card;
   };
 

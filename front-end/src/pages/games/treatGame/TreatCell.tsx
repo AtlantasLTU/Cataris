@@ -1,16 +1,16 @@
 import aliveIcon from '/src/assets/treat/fish-alive.png';
 import deadIcon from '/src/assets/treat/fish-dead.png';
 
-export type TreatCellData = {
+export interface TreatCellData {
   value: 0 | 1;
   isOpened: boolean;
-};
+}
 
-type TreatCellProps = {
+interface TreatCellProps {
   cell: TreatCellData;
   onReveal: () => void;
   disabled: boolean;
-};
+}
 
 const TreatCell = ({ cell, onReveal, disabled }: TreatCellProps) => {
   return (

@@ -47,7 +47,7 @@ if (position.currentRow === 11) {
     playerBoundingBox.setFromObject(player);
 
     for(const {ref} of row.vehicles){
-      if (!ref || !ref.visible) return;  // Skip invisible vehicles
+      if (!ref?.visible) return;  // Skip invisible vehicles
 
       const vehicleBoundingBox = new THREE.Box3();
       vehicleBoundingBox.setFromObject(ref);

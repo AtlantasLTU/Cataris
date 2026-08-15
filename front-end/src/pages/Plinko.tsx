@@ -4,68 +4,28 @@ import { WIDTH, HEIGHT } from "./plinko/constants";
 import { pad } from "./plinko/padding";
 //import axios from "axios";
 import BettingPanel from "../components/BettingPanelPlinko";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { fetchWalletBalance } from "../api/auth";
 import Login from "./Login";
 import Register from "./Register";
 import logo from "../assets/LOGO.svg";
 //import { baseURL } from "../utils/index";
 import { updateWalletBalance } from "../api/auth";
 import plinko from "../assets/games/Plinko.png"
+import { useAuthModal } from "../hooks/useAuthModal";
+import { useIsAuthenticated } from "../hooks/useAuth";
 //import yarnBall from "../assets/ball.svg"; // <- tu podmień ścieżkę
 
 export default function PlinkoGame() {
   const [ballManager, setBallManager] = useState<BallManager>();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);;
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const [showLogin, setShowLogin] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
-  const [balance, setBalance] = useState<number>(0.0);
+  const { showLogin, showRegister, closeAuthModal } = useAuthModal("/games/plinko");
   const [betAmount, setBetAmount] = useState<number | null>(null);
   const [gameOver, setGameOver] = useState(false);
-
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-
+  const isAuthenticated = useIsAuthenticated();
   const lastBetRef = useRef<number | null>(null);
 
   // Multipliers aligned with sinks (left to right)
   const multipliers = [16, 9, 2, 1.4, 1.4, 1.2, 1.1, 1, 0.5, 1, 1.1, 1.2, 1.4, 1.4, 2, 9, 16];
 
-  useEffect(() => {
-    const auth = searchParams.get("auth"); 
-    setShowLogin(auth === "login");
-    setShowRegister(auth === "register");
-
-    const token = localStorage.getItem("token");
-    setIsAuthenticated(!!token)
-    console.log(token)
-  }, [searchParams]);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsAuthenticated(!!token);
-
-    if (token) {
-      const getBalance = async () => {
-        const result = await fetchWalletBalance();
-        if ('balance' in result) {
-          setBalance(result.balance);
-          console.log('Account Balance in plinko:', balance);
-        } else {
-          console.error("Failed to fetch wallet balance:", result.message);
-        }
-      };
-      void getBalance();
-      // Fetch user balance if authenticated
-    }
-  }, []);
-
-  const closeAuthModal = () => {
-    setShowLogin(false);
-    setShowRegister(false);
-    void navigate("/games/meow-jack", { replace: true }); // clears ?auth=...
-  };
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -107,7 +67,7 @@ export default function PlinkoGame() {
     ro.observe(parent);
     window.addEventListener('resize', resize);
     
-    const manager = new BallManager(canvas as HTMLCanvasElement, async (sinkIndex) => {
+    const manager = new BallManager(canvas, async (sinkIndex) => {
       const wager = lastBetRef.current;
       if (wager === null || sinkIndex === undefined || sinkIndex < 0 || sinkIndex >= multipliers.length) return;
       const multiplier = multipliers[sinkIndex];

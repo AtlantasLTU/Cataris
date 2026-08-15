@@ -177,7 +177,7 @@ function hasVehicles(row: Row): row is (
 
   // 3) Replace metadata row with a clean stopBollard row object (no hybrid states)
   // Adjust shape to match your Row union:
-  metadata[metaIndex] = { type: "stopBollard" } as Row;
+  metadata[metaIndex] = { type: "stopBollard" };
 
   // 4) Build new row mesh
   const newRow = Road(rowIndex);

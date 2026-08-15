@@ -1,67 +1,32 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { fetchWalletBalance } from "../api/auth";
+import { useIsAuthenticated } from "../hooks/useAuth";
+import { useBalance } from "../hooks/useBalance";
 
-type BettingPanelProps = {
+interface BettingPanelProps {
   children?: ReactNode;
   betAmount: number | null;
   setBetAmount: (amount: number | null) => void;
   startGame: () => void;
   dropBall: () => void;
   gameOver: boolean;
-};
+}
 
 
 export default function BettingPanel({ children, betAmount, setBetAmount, startGame, dropBall, gameOver }: BettingPanelProps) {
-  const [balance, setBalance] = useState<number>(0.0); // Example balance, replace with actual fetched balance
-  const [mode, setMode] = useState("manual");
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const isAuthenticated = useIsAuthenticated();
+  const { balance: accountBalance } = useBalance();
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [mode, setMode] = useState("manual");
 
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const authenticated = !!token
-    setIsAuthenticated(authenticated);
-
-    if (!authenticated) return;
-
-    const getBalance = async () => {
-      const result = await fetchWalletBalance();
-      if ('balance' in result) {
-        setBalance(parseFloat(result.balance.toFixed(2)));
-        console.log('Account Balance in BettingPanel:', result.balance);
-      } else {
-        console.error("Failed to fetch wallet balance:", result.message);
-      }
-    };
-    getBalance();
-
-    const handleBalanceRefresh = () => {
-      getBalance();
-    }
-    // Fetch user balance if authenticated
-    window.addEventListener("balance:refresh", handleBalanceRefresh);
-
-    return () => {
-      window.removeEventListener("balance:refresh", handleBalanceRefresh);
-    }
-  }, []);
-
-
-  const isGoButtonActive = betAmount !== null && betAmount > 0 && !gameOver && betAmount <= balance;
+  const isGoButtonActive = betAmount !== null && betAmount > 0 && !gameOver && betAmount <= (accountBalance ?? 0);
   const hasEnoughBalance =
     isAuthenticated &&
     betAmount !== null &&
     betAmount > 0 &&
-    betAmount <= balance;
+    betAmount <= (accountBalance ?? 0);
 
   const handleGoButtonClick = () => {
     if(!hasEnoughBalance || gameOver || isButtonDisabled) return;
-
-    // Locally deduct to prevent rapid clicks driving balance negative before refresh
-    if (betAmount !== null) {
-      setBalance((prev) => Math.max(0, prev - betAmount));
-    }
 
     setIsButtonDisabled(true);
     setTimeout(() => setIsButtonDisabled(false), 300);

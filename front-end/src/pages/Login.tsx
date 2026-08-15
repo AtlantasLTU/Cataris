@@ -24,12 +24,10 @@ const Login: React.FC<LoginProps> = ({ onClose }) => {
             console.log('Login result:', result);
 
             if ('token' in result) {
-                localStorage.setItem('token', result.token);
                 if (onClose) {
                     onClose();
                 }
                 void navigate("/");
-                window.location.reload();
             }
             else {
                 setError("Invalid username or password. Please try again");

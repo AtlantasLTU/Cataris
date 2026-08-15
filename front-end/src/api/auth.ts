@@ -1,4 +1,5 @@
 ﻿import axios from 'axios';
+import { getToken, setToken } from '../auth/tokenStore';
 
 // .NET API (API/) runs on 5054; the old C++ server.exe was on 8080.
 const API_URL = 'http://localhost:5054/api';
@@ -11,7 +12,7 @@ const api = axios.create({
 // Every authenticated endpoint needs the same header, so it is attached once
 // here instead of being rebuilt at each call site.
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token = getToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -80,7 +81,7 @@ const toAuthError = (error: unknown, action: string): AuthError => {
 // The authenticated endpoints fail fast rather than sending a request that is
 // certain to 401. The interceptor still attaches the header for the real call.
 const missingToken = (): AuthError | null =>
-  localStorage.getItem('token')
+  getToken()
     ? null
     : { type: 'auth_error', message: 'No authentication token found. Please log in again.' };
 
@@ -93,7 +94,8 @@ export const login = async (username: string, password: string): Promise<LoginRe
       return { type: 'unknown_error', message: 'Login failed: Invalid response' };
     }
 
-    localStorage.setItem('token', data);
+    // setToken, not localStorage.setItem -- this is what notifies useIsAuthenticated.
+    setToken(data);
     return { token: data };
   } catch (error) {
     return toAuthError(error, 'Login');

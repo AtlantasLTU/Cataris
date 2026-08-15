@@ -1,10 +1,10 @@
 import TreatCell, { type TreatCellData } from './TreatCell';
 
-type TreatBoardProps = {
+interface TreatBoardProps {
   grid: TreatCellData[][];
   onReveal: (rowIndex: number, columnIndex: number) => void;
   disabled: boolean;
-};
+}
 
 const TreatBoard = ({ grid, onReveal, disabled }: TreatBoardProps) => (
   <div className="treat-board" role="grid" aria-label="Treat board">

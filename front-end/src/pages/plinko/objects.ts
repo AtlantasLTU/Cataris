@@ -15,7 +15,7 @@ export interface Sink {
     multiplier?: number;
 }
 
-const MULTIPLIERS: {[ key: number ]: number} = {
+const MULTIPLIERS: Record<number, number> = {
     0: 16,
     1: 9,
     2: 2,
