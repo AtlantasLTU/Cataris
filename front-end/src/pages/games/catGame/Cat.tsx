@@ -5,7 +5,7 @@ import Register from "../../Register";
 import BettingPanel from "../gameComponents/BettingPanel";
 import Cat, { type CatHandle } from "./CatGame";
 import logo from "../../../assets/LOGO.svg";
-import cat from "../../../assets/games/game-cat.png";
+import cat from "../../../assets/games/game-cat.webp";
 import { useAuthModal } from "../../../hooks/useAuthModal";
 import { useIsAuthenticated } from "../../../hooks/useAuth";
 

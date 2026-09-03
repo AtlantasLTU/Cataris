@@ -10,7 +10,7 @@ import banner from "../assets/BANNER.svg";
 import cardDeck from "../assets/DECK-CARDS.svg";
 import logo from "../assets/LOGO.svg";
 import { updateWalletBalance } from "../api/auth";
-import meowJack from "../assets/games/game-meowjack.png";
+import meowJack from "../assets/games/game-meowjack.webp";
 import { useIsAuthenticated } from "../hooks/useAuth";
 
 

@@ -4,12 +4,12 @@ import Register from "./Register";
 
 
 // Promotion images
-import promo1 from '../assets/Promotion/1st-promotion.png';
-import promo2 from '../assets/Promotion/2nd-promotion.png';
-import promo3 from '../assets/Promotion/3rd-promotion.png';
-import promo4 from '../assets/Promotion/4th-promotion.png';
-import promo5 from '../assets/Promotion/5th-promotion.png';
-import banner from '../assets/Promotion/promotion-banner.png';
+import promo1 from '../assets/Promotion/1st-promotion.webp';
+import promo2 from '../assets/Promotion/2nd-promotion.webp';
+import promo3 from '../assets/Promotion/3rd-promotion.webp';
+import promo4 from '../assets/Promotion/4th-promotion.webp';
+import promo5 from '../assets/Promotion/5th-promotion.webp';
+import banner from '../assets/Promotion/promotion-banner.webp';
 import { useAuthModal } from "../hooks/useAuthModal";
 
 interface Promotion {
@@ -61,10 +61,10 @@ const promotionsData: Promotion[] = [
 export default function Promotions() {
   const { showLogin, showRegister, closeAuthModal } = useAuthModal("/promotions");
   return (
-    <main className="promotions">
+    <main className="promotions pt-5.5 pb-5.5">
       {/* BANNER */}
-      <div className="promotions__banner">
-        <img src={banner} alt="" />
+      <div className="promotions__banner hover:scale-102 transition-transform duration-200">
+        <img src={banner} alt="" width={2560} height={1103} fetchPriority="high" decoding="async" />
       </div>
 
       {/* PROMOTION CARDS */}
@@ -76,6 +76,8 @@ export default function Promotions() {
                 <img 
                   src={promo.imageUrl} 
                   alt={promo.title}
+                  loading="lazy"
+                  decoding="async"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="280" height="200"%3E%3Crect fill="%23234567" width="280" height="200"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23fff" font-size="16" font-family="Arial"%3EPromo Image%3C/text%3E%3C/svg%3E';

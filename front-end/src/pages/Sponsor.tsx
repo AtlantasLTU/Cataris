@@ -1,4 +1,4 @@
-import logo from "../assets/logo.png";
+import logo from "../assets/logo.webp";
 import logo_avatar from "../assets/LOGO.svg"
 import meowspaceLogo from "../assets/MSlogo.svg"; // Add this line
 import "./Sponsor.css";
@@ -94,7 +94,7 @@ export default function Sponsor() {
           <section className="meowspace-sponsor">
             <h3 className="meowspace-sponsor__title">Sponsored by:</h3>
             <a
-              href="http://meowspace.lt/"
+              href="/"
               target="_blank"
               rel="noopener noreferrer"
               className="meowspace-sponsor__link"

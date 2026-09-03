@@ -9,7 +9,7 @@ import Register from "./Register";
 import logo from "../assets/LOGO.svg";
 //import { baseURL } from "../utils/index";
 import { updateWalletBalance } from "../api/auth";
-import plinko from "../assets/games/Plinko.png"
+import plinko from "../assets/games/Plinko.webp"
 import { useAuthModal } from "../hooks/useAuthModal";
 import { useIsAuthenticated } from "../hooks/useAuth";
 //import yarnBall from "../assets/ball.svg"; // <- tu podmień ścieżkę

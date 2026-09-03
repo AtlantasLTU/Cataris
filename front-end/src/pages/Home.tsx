@@ -6,10 +6,10 @@ import Register from "./Register";
 
 // Paveiksliukai (keisk kelius/pavadinimus pagal save)
 import hero from "../assets/home/hero.svg";
-import gameCat from '../assets/games/game-cat.png';
-import gameMice from '../assets/games/game-mice.png';
-import gameTreat from '../assets/games/game-treat.png';
-import gameMeowJack from '../assets/games/game-meowjack.png';
+import gameCat from '../assets/games/game-cat.webp';
+import gameMice from '../assets/games/game-mice.webp';
+import gameTreat from '../assets/games/game-treat.webp';
+import gameMeowJack from '../assets/games/game-meowjack.webp';
 import sponsorLogo from '../assets/LOGO.svg'; // Using existing logo as sponsor logo
 import { useAuthModal } from "../hooks/useAuthModal";
 
@@ -23,7 +23,7 @@ export default function Home() {
 
       {/* HERO */}
       <Link to="/games" className="hero hero--clickable" aria-label="Play now – go to Games">
-        <img src={hero} alt="" />
+        <img src={hero} alt="" width={1280} height={650} fetchPriority="high" decoding="async" />
       </Link>
 
       {/* FEATURED GAMES */}
@@ -34,19 +34,19 @@ export default function Home() {
 
         <div className="games grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           <Link to="/games/cat" className="gamecard" aria-label="Play CAT">
-            <img src={gameCat} alt="CAT game" className="w-full h-auto" />
+            <img src={gameCat} alt="CAT game" className="w-full h-auto" width={289} height={435} loading="lazy" decoding="async" />
           </Link>
 
           <Link to="/games/dice" className="gamecard" aria-label="Play MICE">
-            <img src={gameMice} alt="MICE game" />
+            <img src={gameMice} alt="MICE game" width={640} height={953} loading="lazy" decoding="async" />
           </Link>
 
           <Link to="/games/treat" className="gamecard" aria-label="Play TREAT">
-            <img src={gameTreat} alt="TREAT game" className="w-full h-auto" />
+            <img src={gameTreat} alt="TREAT game" className="w-full h-auto" width={640} height={961} loading="lazy" decoding="async" />
           </Link>
 
           <Link to="/games/meow-jack" className="gamecard" aria-label="Play MEOW-JACK">
-            <img src={gameMeowJack} alt="MEOW-JACK game" className="w-full h-auto" />
+            <img src={gameMeowJack} alt="MEOW-JACK game" className="w-full h-auto" width={640} height={956} loading="lazy" decoding="async" />
           </Link>
         </div>
       </section>

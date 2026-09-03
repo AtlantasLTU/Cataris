@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { NavLink, Link, useLocation, useNavigate } from "react-router-dom";
-import logo from "../assets/logo.png";
+import logo from "../assets/logo.webp";
 import "./Navbar.css";
 import icHome from "../assets/house.png";
 import icGame from "../assets/game.png";
 import icTrophy from "../assets/trophy.png";
 import icWallet from "../assets/wallet.png";
-import icSettings from "../assets/settings.png";
-import icAccount from "../assets/account.png";
 import Cataris_coin from "../assets/Cataris_coin.svg";
 import { useIsAuthenticated } from "../hooks/useAuth";
 import { useBalance } from "../hooks/useBalance";
@@ -110,14 +108,8 @@ export default function Navbar() {
 
         <div className="sideMenu__group">
           <NavLink to="/wallet" className="slink btnlike" onClick={() => setOpen(false)}>
-            <i className="sicon"><img src={icWallet} alt="Wallet" /></i> WALLET
+            <i className="sicon"><img src={icWallet} alt="Account" /></i> ACCOUNT
           </NavLink>
-          <button className="slink btnlike" onClick={() => setOpen(false)}>
-            <i className="sicon"><img src={icSettings} alt="Settings" /></i> SETTINGS
-          </button>
-          <button className="slink btnlike" onClick={() => setOpen(false)}>
-            <i className="sicon"><img src={icAccount} alt="Account" /></i> ACCOUNT
-          </button>
           <div className="sideMenu__divider" />
           {!isAuthenticated ? (
             <>

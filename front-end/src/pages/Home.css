@@ -1,6 +1,6 @@
 .home{
   background: linear-gradient(180deg, #0b2a52 0%, #0a1f3b 100%);
-  min-height: 150dvh;
+  min-height: 120dvh;
   color: #fff;
   overflow-x: hidden;
 }

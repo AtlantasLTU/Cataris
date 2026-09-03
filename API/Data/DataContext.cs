@@ -9,7 +9,8 @@ namespace API.Data
     {
         // Pinned so EF never needs a live connection to detect the server version
         // (AutoDetect would require the database to be up at design time).
-        public static readonly MySqlServerVersion ServerVersion = new(new Version(8, 0, 43));
+        // Bump to match your actual MariaDB version (SELECT VERSION();) if it differs.
+        public static readonly ServerVersion ServerVersion = new MariaDbServerVersion(new Version(10, 11, 0));
 
         public DataContext(DbContextOptions options) : base(options)
         {

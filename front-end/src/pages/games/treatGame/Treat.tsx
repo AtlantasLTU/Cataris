@@ -7,7 +7,7 @@ import Login from "../../Login";
 import Register from "../../Register";
 import { updateWalletBalance } from "../../../api/auth";
 import logo from "../../../assets/LOGO.svg";
-import treat from "../../../assets/games/game-treat.png";
+import treat from "../../../assets/games/game-treat.webp";
 import { useAuthModal } from '../../../hooks/useAuthModal';
 import { useIsAuthenticated } from '../../../hooks/useAuth';
 

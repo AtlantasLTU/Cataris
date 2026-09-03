@@ -2,6 +2,13 @@
   --bg1:#0a1f3b; --bg2:#0b2a52; --txt:#fff; --muted:#95a2b3; --primary:#fff;
   --blueTop:#133a6a; --blueBot:#0a1f3b;
   --line: rgba(255,255,255,.15);
+
+  /* Navbar geometry. Derived rather than hard-coded so the value stays correct
+     if the logo or padding changes - the games page sizes itself against it. */
+  --nav-logo-h: 70px;
+  --nav-pad-y: 10px;
+  --nav-border: 1px;
+  --nav-h: calc(var(--nav-logo-h) + 2 * var(--nav-pad-y) + var(--nav-border));
 }
 
 /* NAVBAR */
@@ -11,10 +18,10 @@
   top:0; 
   z-index:50;
   background:linear-gradient(180deg,var(--bg1),var(--bg2));
-  color:var(--txt); border-bottom:1px solid rgba(255,255,255,.06);
+  color:var(--txt); border-bottom:var(--nav-border) solid rgba(255,255,255,.06);
   min-height:64px; backdrop-filter:blur(4px);
 }
-.nvb__inner{ max-width:1200px; margin:0 auto; padding:10px 18px;
+.nvb__inner{ max-width:1200px; margin:0 auto; padding:var(--nav-pad-y) 18px;
   display:flex; align-items:center; justify-content:space-between; gap:16px; }
 
 /* KAIRĖ */
@@ -28,7 +35,7 @@
 .nvb__burger.is-open span{ background:#fff; box-shadow:0 -6px 0 #fff, 0 6px 0 #fff; }
 
 .nvb__brand{ display:flex; align-items:center; text-decoration:none; color:var(--txt); }
-.nvb__brand img{ height:70px; width:auto; filter:drop-shadow(0 0 2px rgba(0,0,0,.4)); }
+.nvb__brand img{ height:var(--nav-logo-h); width:auto; filter:drop-shadow(0 0 2px rgba(0,0,0,.4)); }
 
 /* CENTRAS */
 .nvb__links{ list-style:none; display:flex; gap:24px; margin:0; padding:0; }

@@ -1,1 +1,8 @@
 @import "tailwindcss";
+/* Shown while a lazily-loaded route chunk is in flight. */
+.route-fallback {
+  display: grid;
+  place-items: center;
+  min-height: 50vh;
+  opacity: .7;
+}

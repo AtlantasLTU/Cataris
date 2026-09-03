@@ -5,12 +5,12 @@ import Register from "./Register";
 import { Link } from "react-router-dom";
 
 // Import game images
-import gameCat from '../assets/games/game-cat.png';
-import gameMice from '../assets/games/game-mice.png';
-import gameTreat from '../assets/games/game-treat.png';
-import gameMeowJack from '../assets/games/game-meowjack.png';
-import gamePlinko from '../assets/games/Plinko.png';
-import gameRoulette from '../assets/games/Roulette.png';
+import gameCat from '../assets/games/game-cat.webp';
+import gameMice from '../assets/games/game-mice.webp';
+import gameTreat from '../assets/games/game-treat.webp';
+import gameMeowJack from '../assets/games/game-meowjack.webp';
+import gamePlinko from '../assets/games/Plinko.webp';
+import gameRoulette from '../assets/games/Roulette.webp';
 import { useAuthModal } from '../hooks/useAuthModal';
 
 
@@ -58,9 +58,9 @@ const games: Game[] = [
 export default function Games() {
   const { showLogin, showRegister, closeAuthModal } = useAuthModal("/games");
   return (
-    <div className="games-container">
+    <div className="games-container pt-5">
       <div className="games-header">
-        <h1 className="games-title">CATARIS ORIGINAL GAMES</h1>
+        <h1 className="games-title pl-100">CATARIS ORIGINAL GAMES</h1>
       </div>
 
       <div className="games-grid">

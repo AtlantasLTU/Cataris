@@ -7,7 +7,7 @@ import logo from "../assets/LOGO.svg";
 import Login from "./Login";
 import Register from "./Register";
 import { updateWalletBalance } from "../api/auth";
-import mice from '../assets/games/game-mice.png';
+import mice from '../assets/games/game-mice.webp';
 import { useAuthModal } from '../hooks/useAuthModal';
 import { useIsAuthenticated } from '../hooks/useAuth';
 import { useBalance } from '../hooks/useBalance';
