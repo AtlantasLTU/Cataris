@@ -1,5 +1,7 @@
 ﻿import axios from 'axios';
 import { getToken, setToken } from '../auth/tokenStore';
+import { GUEST_MODE } from '../guestMode';
+import { applyGuestWager, getGuestBalance } from './guestWallet';
 
 // .NET API (API/) runs on 5054; the old C++ server.exe was on 8080.
 const API_URL = 'http://localhost:5054/api';
@@ -128,6 +130,8 @@ export const register = async (
 };
 
 export const fetchWalletBalance = async (): Promise<WalletBalanceResponse | AuthError> => {
+  if (GUEST_MODE) return { balance: getGuestBalance() };
+
   const noToken = missingToken();
   if (noToken) return noToken;
 
@@ -144,6 +148,13 @@ export const updateWalletBalance = async (
   wager: string,
   outcome: 'win' | 'loss'
 ): Promise<WalletBalanceResponse | AuthError> => {
+  if (GUEST_MODE) {
+    const result = applyGuestWager(wager, outcome);
+    return typeof result === 'number'
+      ? { balance: result }
+      : { type: 'http_error', message: `Wallet balance update failed: ${result}` };
+  }
+
   const noToken = missingToken();
   if (noToken) return noToken;
 

@@ -10,6 +10,7 @@ import Cataris_coin from "../assets/Cataris_coin.svg";
 import { useIsAuthenticated } from "../hooks/useAuth";
 import { useBalance } from "../hooks/useBalance";
 import { clearToken } from "../auth/tokenStore";
+import { GUEST_MODE } from "../guestMode";
 
 
 export default function Navbar() {
@@ -82,9 +83,11 @@ export default function Navbar() {
               <Link to="/wallet" className="btn btn--primary hidden sm:block">
                 ACCOUNT
               </Link>
-              <button onClick={handleLogout} className="btn btn--ghost ml-4 hidden sm:block">
-                LOGOUT
-              </button>
+              {!GUEST_MODE && (
+                <button onClick={handleLogout} className="btn btn--ghost ml-4 hidden sm:block">
+                  LOGOUT
+                </button>
+              )}
             </>
           )}
         </div>
@@ -120,7 +123,7 @@ export default function Navbar() {
                 REGISTER
               </NavLink>
             </>
-          ) : (
+          ) : !GUEST_MODE && (
             <>
               <button className="slink btnlike bg-red-500! text-white hover:bg-red-700! p-2 rounded" onClick={handleLogout}>
                 LOGOUT

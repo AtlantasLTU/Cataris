@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { fetchWalletBalance } from "../api/auth";
+import { getToken } from "../auth/tokenStore";
 
 interface BettingPanelDiceProps {
   children?: ReactNode;
@@ -24,7 +25,7 @@ export default function BettingPanelDice({
   const [mode, setMode] = useState("manual");
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     if (!token) return;
 
     const getBalance = async () => {

@@ -1,9 +1,15 @@
 [build]
   # The directory that contains the output of your build process
   publish = "dist"
-  
+
   # Command to build your site
   command = "npm run build"
+
+# There is no API or database on Netlify, so build the account-free guest version
+# (see src/guestMode.ts). Wallet balances are kept per browser.
+[build.environment]
+  VITE_GUEST_MODE = "true"
+  NODE_VERSION = "22"
 
 [dev]
   # Command to run the development server locally
@@ -11,12 +17,8 @@
   port = 3000
   targetPort = 3000
 
-[[redirects]]
-  from = "/cataris/api/*"
-  to = "http://78.56.50.205/cataris/api/:splat"
-  status = 200
-  force = true
-
+# Single-page app: let React Router handle every path, so reloading
+# /games/plinko doesn't 404.
 [[redirects]]
   from = "/*"
   to = "/index.html"

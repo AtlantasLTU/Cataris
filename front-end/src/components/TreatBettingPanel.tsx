@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { fetchWalletBalance } from "../api/auth";
+import { getToken } from "../auth/tokenStore";
 
 interface BettingPanelProps {
   children?: ReactNode;
@@ -24,7 +25,7 @@ export default function TreatBettingPanel({ children, betAmount, setBetAmount, s
   const [autoCashoutInput, setAutoCashoutInput] = useState(() => autoCashout.toString());
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getToken();
 
     if (token) {
       const getBalance = async () => {

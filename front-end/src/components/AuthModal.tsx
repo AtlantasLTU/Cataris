@@ -1,6 +1,7 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
+import { GUEST_MODE } from "../guestMode";
 
 export default function AuthModal() {
   const [params] = useSearchParams();
@@ -9,7 +10,7 @@ export default function AuthModal() {
   const a = params.get("auth");
   const auth = a === "login" || a === "register" ? a : null;
 
-  if (!auth) return null;
+  if (!auth || GUEST_MODE) return null;
 
   const close = () => {
     void navigate(".", { replace: true });

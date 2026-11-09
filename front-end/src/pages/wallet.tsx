@@ -6,6 +6,7 @@ import logo from "../assets/LOGO.svg";
 import { useAuthModal } from "../hooks/useAuthModal";
 import { useIsAuthenticated } from "../hooks/useAuth";
 import { useBalance } from "../hooks/useBalance";
+import { GUEST_MODE } from "../guestMode";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -153,19 +154,23 @@ export default function Wallet() {
 
         {/* Card */}
         <div className="bg-[#0f2a44] rounded-xl p-6 mb-6 shadow-xl">
-          <div className="py-4 border-b border-[#1e4f8f]">
-            <span className="text-sm text-[#7fb3ff]">Username</span>
-            <div className="text-lg font-semibold text-white">
-              {username}
-            </div>
-          </div>
+          {!GUEST_MODE && (
+            <>
+              <div className="py-4 border-b border-[#1e4f8f]">
+                <span className="text-sm text-[#7fb3ff]">Username</span>
+                <div className="text-lg font-semibold text-white">
+                  {username}
+                </div>
+              </div>
 
-          <div className="py-4 border-b border-[#1e4f8f]">
-            <span className="text-sm text-[#7fb3ff]">Email</span>
-            <div className="text-lg font-semibold text-white">
-              {email}
-            </div>
-          </div>
+              <div className="py-4 border-b border-[#1e4f8f]">
+                <span className="text-sm text-[#7fb3ff]">Email</span>
+                <div className="text-lg font-semibold text-white">
+                  {email}
+                </div>
+              </div>
+            </>
+          )}
 
           <div className="pt-4">
             <span className="text-sm text-[#7fb3ff]">Wallet</span>
@@ -187,52 +192,54 @@ export default function Wallet() {
           {loading ? "Processing..." : depositCooldown > 0 ? `Deposit (${Math.floor(depositCooldown / 60)}:${(depositCooldown % 60).toString().padStart(2, '0')})` : `Deposit`}
         </button>
       </div>
-      <aside className="max-w-2xl mx-auto p-5">
+      {!GUEST_MODE && (
+        <aside className="max-w-2xl mx-auto p-5">
 
-        <h2 className="text-xl font-semibold text-[#dbeafe] mb-4">Edit profile</h2>
-        <div className="bg-[#0f2a44] rounded-xl p-6 mb-6 shadow-xl">
-          <label className="block text-sm text-[#7fb3ff] mb-1">Username</label>
-          <input
-            value={editUsername}
-            onChange={(e) => setEditUsername(e.target.value)}
-            className="w-full mb-4 px-3 py-2 rounded-lg bg-[#0b1f33] border border-[#1e4f8f] text-white outline-none focus:border-blue-400"
-            placeholder="Enter username"
-          />
+          <h2 className="text-xl font-semibold text-[#dbeafe] mb-4">Edit profile</h2>
+          <div className="bg-[#0f2a44] rounded-xl p-6 mb-6 shadow-xl">
+            <label className="block text-sm text-[#7fb3ff] mb-1">Username</label>
+            <input
+              value={editUsername}
+              onChange={(e) => setEditUsername(e.target.value)}
+              className="w-full mb-4 px-3 py-2 rounded-lg bg-[#0b1f33] border border-[#1e4f8f] text-white outline-none focus:border-blue-400"
+              placeholder="Enter username"
+            />
 
-          <label className="block text-sm text-[#7fb3ff] mb-1">Email</label>
-          <input
-            value={editEmail}
-            onChange={(e) => setEditEmail(e.target.value)}
-            className="w-full mb-4 px-3 py-2 rounded-lg bg-[#0b1f33] border border-[#1e4f8f] text-white outline-none focus:border-blue-400"
-            placeholder="Enter email"
-          />
-          {saveSuccess && (
-            <div className="mb-3 text-sm text-green-300 bg-green-900/20 border border-green-600/30 rounded-lg p-2">
-              {saveSuccess}
-            </div>
-          )}
-        </div>
-        <div className="flex gap-3">
-          <button
-            onClick={() => void handleSaveUserInfo()}
-            disabled={saving || !hasChanges || !isEmailValid}
-            className="flex-1 py-3 bg-blue-500 rounded-lg font-semibold hover:bg-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {saving ? "Saving..." : "Save changes"}
-          </button>
+            <label className="block text-sm text-[#7fb3ff] mb-1">Email</label>
+            <input
+              value={editEmail}
+              onChange={(e) => setEditEmail(e.target.value)}
+              className="w-full mb-4 px-3 py-2 rounded-lg bg-[#0b1f33] border border-[#1e4f8f] text-white outline-none focus:border-blue-400"
+              placeholder="Enter email"
+            />
+            {saveSuccess && (
+              <div className="mb-3 text-sm text-green-300 bg-green-900/20 border border-green-600/30 rounded-lg p-2">
+                {saveSuccess}
+              </div>
+            )}
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={() => void handleSaveUserInfo()}
+              disabled={saving || !hasChanges || !isEmailValid}
+              className="flex-1 py-3 bg-blue-500 rounded-lg font-semibold hover:bg-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {saving ? "Saving..." : "Save changes"}
+            </button>
 
-          <button
-            onClick={handleReset}
-            disabled={saving}
-            className="py-3 px-4 bg-[#0b1f33] border border-[#1e4f8f] rounded-lg font-semibold hover:bg-[#0e2b45] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Reset
-          </button>
-        </div>
-        <p className="text-xs text-[#7fb3ff] mt-3 opacity-80">
-          Changes are applied after confirmation and reloaded from backend.
-        </p>
-      </aside>
+            <button
+              onClick={handleReset}
+              disabled={saving}
+              className="py-3 px-4 bg-[#0b1f33] border border-[#1e4f8f] rounded-lg font-semibold hover:bg-[#0e2b45] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Reset
+            </button>
+          </div>
+          <p className="text-xs text-[#7fb3ff] mt-3 opacity-80">
+            Changes are applied after confirmation and reloaded from backend.
+          </p>
+        </aside>
+      )}
       {/* LOGIN MODAL */}
       {showLogin && (
         <div className="modal" role="dialog" aria-modal="true" aria-labelledby="login-title">

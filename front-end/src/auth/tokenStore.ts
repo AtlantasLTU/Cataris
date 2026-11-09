@@ -1,7 +1,12 @@
+import { GUEST_MODE } from '../guestMode';
+
 const TOKEN_KEY = 'token';
 const AUTH_CHANGED = 'auth:changed';
 
 export function getToken(): string | null {
+  // A constant non-null token makes every useIsAuthenticated() gate pass, so the
+  // games need no guest-specific code of their own.
+  if (GUEST_MODE) return 'guest';
   return localStorage.getItem(TOKEN_KEY);
 }
 
