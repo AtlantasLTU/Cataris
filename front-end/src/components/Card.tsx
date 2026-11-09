@@ -1,6 +1,15 @@
 import React from "react";
 import { motion, type Variants, type TargetAndTransition } from "framer-motion";
 
+// A literal "/src/assets/..." path only works on the dev server; a build has no src/
+// and Vite only copies assets that are imported. The glob imports every card face
+// as a hashed URL, so the SVGs still load one by one, only when a card is shown.
+const cardImages = import.meta.glob<string>("../assets/Cards/*_of_*.svg", {
+  eager: true,
+  query: "?url",
+  import: "default",
+});
+
 interface CardProps {
   card: {
     suit: string;
@@ -49,7 +58,7 @@ const Card: React.FC<CardProps> = ({
   flipped = false,
 }) => {
   const imgName = `${card.rank}_of_${card.suit}.svg`;
-  const imgPath = `/src/assets/Cards/${imgName}`;
+  const imgPath = cardImages[`../assets/Cards/${imgName}`];
 
   // Stała ramka (bez animacji skali)
   const borderClass =
