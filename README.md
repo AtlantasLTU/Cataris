@@ -7,8 +7,9 @@ A cat-themed online casino that uses play money only. Originally a group project
 - **`API/`**: ASP.NET Core (.NET 10) Web API with ASP.NET Identity on MySQL. Handles accounts,
   JWT login and the wallet balance.
 
-> The `static-guest-mode` branch is a version with no accounts and no backend, for hosting on Netlify.
-> See that branch's README.
+> **This is the `static-guest-mode` branch.** It adds a guest mode, so the front-end can be hosted
+> on Netlify without the API or a database. See [Guest mode](#guest-mode-static-hosting) below. The
+> `main` branch is the version with accounts.
 
 ## Games
 
@@ -65,3 +66,44 @@ Run these from `front-end/`:
 | `npm run lint` | ESLint with type-aware rules, `--max-warnings 0` |
 
 See [`front-end/README.md`](front-end/README.md) for how the front-end is laid out.
+
+## Guest mode (static hosting)
+
+A build made with `VITE_GUEST_MODE=true` doesn't need the API at all:
+
+- There are no accounts. Every visitor counts as logged in. Login, register, logout and profile
+  editing are hidden.
+- Each visitor's balance is saved in their own browser's `localStorage` and starts at **1000**.
+  Wagers follow the same rules as the API: the amount must be positive, and a loss can't take the
+  balance below zero. Deposit on the wallet page still adds 50, with a 5-minute cooldown.
+- All the games work unchanged, because they call the same wallet functions as before.
+
+Because the balance is stored in the browser, clearing site data or switching device or browser
+resets it to 1000. Anyone can also edit it in dev tools, which is fine for play money.
+
+### Running guest mode locally
+
+```bash
+cd front-end
+npm install
+VITE_GUEST_MODE=true npm run dev
+```
+
+You don't need the API or MySQL.
+
+### Deploying to Netlify
+
+`front-end/netlify.toml` already sets `VITE_GUEST_MODE=true` and Node 22. It also adds a rule that
+sends every path to `index.html`, so reloading a page like `/games/plinko` doesn't 404. In
+Netlify's build settings:
+
+| Setting | Value |
+|---|---|
+| Branch to deploy | `static-guest-mode` |
+| Base directory | `front-end` |
+| Build command | `npm run build` |
+| Publish directory | `front-end/dist` |
+
+The base directory is what makes Netlify read `front-end/netlify.toml`. If the deployed site shows
+Login/Register buttons instead of a $1000.00 balance, guest mode is off. Add `VITE_GUEST_MODE` =
+`true` under *Site configuration → Environment variables* and deploy again.

@@ -8,7 +8,9 @@ React 19 + TypeScript + Vite + Tailwind 4. For setup and the full-stack overview
 ```
 src/
   App.tsx              routes; every page except Home is lazy-loaded
+  guestMode.ts         GUEST_MODE flag, read from VITE_GUEST_MODE at build time
   api/auth.ts          every call to the API (axios, base URL http://localhost:5054/api)
+  api/guestWallet.ts   the localStorage wallet used in guest mode
   auth/tokenStore.ts   the JWT in localStorage, exposed to useSyncExternalStore
   hooks/
     useAuth.ts         useToken / useIsAuthenticated
@@ -31,6 +33,20 @@ betting panels.
 
 The server trusts whatever result the client sends. See "Known issue" in
 [`API/README.md`](../API/README.md).
+
+## Guest mode
+
+When `VITE_GUEST_MODE=true`, the app makes no API calls. This works through three switches, so the
+game code itself doesn't change:
+
+- `getToken()` always returns `'guest'`, so every `useIsAuthenticated()` check passes.
+- `fetchWalletBalance` and `updateWalletBalance` in `api/auth.ts` use `api/guestWallet.ts` instead
+  of axios.
+- The Navbar, the wallet page, `AuthModal` and `useAuthModal` hide all account UI.
+
+Anything new that reads the token should go through `getToken()` rather than reading
+`localStorage` directly, or guest mode won't reach it. See the root README for how to run and deploy
+guest mode.
 
 ## Changing the API address
 
